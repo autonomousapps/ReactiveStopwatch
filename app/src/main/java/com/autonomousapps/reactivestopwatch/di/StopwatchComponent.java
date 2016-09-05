@@ -5,7 +5,7 @@ import com.autonomousapps.reactivestopwatch.ui.StopwatchFragment;
 import dagger.Component;
 
 @Component(modules = {
-        StopwatchModule.class
+        PresenterModule.class
 })
 public interface StopwatchComponent {
 

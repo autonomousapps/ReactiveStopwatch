@@ -1,14 +1,15 @@
 package com.autonomousapps.reactivestopwatch.di;
 
-import com.autonomousapps.reactivestopwatch.ui.StopwatchMvp;
-import com.autonomousapps.reactivestopwatch.ui.StopwatchPresenter;
+import com.autonomousapps.reactivestopwatch.time.Stopwatch;
 
-import dagger.Binds;
 import dagger.Module;
+import dagger.Provides;
 
 @Module
 public abstract class StopwatchModule {
 
-    @Binds
-    public abstract StopwatchMvp.Presenter bindStopwatchPresenter(StopwatchPresenter stopwatchPresenter);
+    @Provides
+    public Stopwatch providesStopwatch() {
+        return new Stopwatch();
+    }
 }

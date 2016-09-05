@@ -46,4 +46,9 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
 
         return view;
     }
+
+    @Override
+    public void onTick(long tick) {
+
+    }
 }
