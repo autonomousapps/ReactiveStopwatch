@@ -3,35 +3,38 @@ package com.autonomousapps.reactivestopwatch.time;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.Subscription;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class Stopwatch {
 
     static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
 
-    private Subscription subscription;
     private Scheduler scheduler = Schedulers.computation();
 
+    private final List<Lap> laps = new ArrayList<>();
+
+    private boolean isReset = false;
     private boolean isPaused = false;
     private long pausedTime = 0L;
+    private long currentTime = 0L;
 
     public Stopwatch() {
     }
 
-    public void start(@NonNull Action1<Long> action) {
-        subscription = Observable.interval(1, TIME_UNIT, scheduler)
-                .map(tick -> tick + 1 - getPausedTime())
+    public Observable<Long> start() {
+        isReset = false;
+
+        return Observable.interval(1, TIME_UNIT, scheduler)
+                .takeWhile(ignored -> !isReset)
+                .map(tick -> currentTime = tick + 1 - getPausedTime())
                 .filter(ignored -> isNotPaused())
-                .onBackpressureDrop()
-                .subscribeOn(scheduler)
-                .observeOn(scheduler)
-                .subscribe(action);
+                .onBackpressureDrop();
     }
 
     private boolean isNotPaused() {
@@ -47,11 +50,20 @@ public class Stopwatch {
     }
 
     public void reset() {
-        subscription.unsubscribe();
+        isReset = true;
     }
 
-    public void lap() {
-        // TODO
+    // TODO do I need the list of laps?
+    public Lap lap() {
+        long lastEndTime = 0L;
+        int lastIndex = laps.size() - 1;
+        if (lastIndex >= 0) {
+            Lap lastLap = laps.get(lastIndex);
+            lastEndTime = lastLap.endTime();
+        }
+        Lap lap = Lap.create(currentTime - lastEndTime, currentTime);
+        laps.add(lap);
+        return lap;
     }
 
     @VisibleForTesting
