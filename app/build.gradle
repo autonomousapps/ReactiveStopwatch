@@ -1,0 +1,95 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.metova.cappuccino-animations'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
+
+    defaultConfig {
+        applicationId "com.autonomousapps.reactivestopwatch"
+        minSdkVersion 24
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0"
+
+        jackOptions {
+            enabled true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    testOptions {
+        // Allows Android code to be called from unit tests without causing a crash.
+        // Helpful for allowing Log.d()-type calls
+        unitTests.returnDefaultValues = true
+    }
+}
+
+dependencies {
+    def androidsupport_version = '24.1.1'
+    def dagger_version = '2.6.1'
+    def butterknife_version = '8.4.0'
+
+    def junit_version = '4.12'
+    def mockito_version = '1.10.19'
+    def dexmaker_version = '1.4'
+    def hamcrest_version = '1.3'
+    def espresso_core_version = '2.2.2'
+    def espresso_runner_version = '0.5'
+    def cappuccino_version = '0.8.1'
+
+//    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile "com.android.support:appcompat-v7:${androidsupport_version}"
+
+    compile "com.jakewharton:butterknife:${butterknife_version}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:${butterknife_version}"
+
+    // Rx
+    compile "io.reactivex:rxandroid:1.2.1"
+    compile "io.reactivex:rxjava:1.1.9"
+
+    // Dagger
+    compile "com.google.dagger:dagger:${dagger_version}"
+//    apt "com.google.dagger:dagger-compiler:${dagger_version}"
+//    androidTestApt "com.google.dagger:dagger-compiler:${dagger_version}"
+    // This is a drop-in replacement for the android-apt plugin. See here: http://tools.android.com/tech-docs/jackandjill
+    annotationProcessor "com.google.dagger:dagger-compiler:${dagger_version}"
+
+    /*
+     * Unit tests
+     */
+    testCompile "junit:junit:${junit_version}"
+    testCompile "org.mockito:mockito-core:${mockito_version}"
+    testCompile "org.hamcrest:hamcrest-library:${hamcrest_version}"
+
+    /*
+     * UI tests
+     */
+    androidTestCompile "com.android.support:support-annotations:${androidsupport_version}"
+    androidTestCompile "com.android.support.test:runner:${espresso_runner_version}"
+    androidTestCompile "com.android.support.test:rules:${espresso_runner_version}"
+    androidTestCompile "com.android.support.test.espresso:espresso-core:${espresso_core_version}"
+    androidTestCompile "com.android.support.test.espresso:espresso-web:${espresso_core_version}"
+    androidTestCompile "com.android.support.test.espresso:espresso-intents:${espresso_core_version}"
+    androidTestCompile("com.android.support.test.espresso:espresso-contrib:2.0") {
+        exclude group: "com.android.support", module: "appcompat"
+        exclude group: "com.android.support", module: "support-v4"
+        exclude module: "recyclerview-v7"
+    }
+    androidTestCompile "org.hamcrest:hamcrest-library:${hamcrest_version}"
+    androidTestCompile "junit:junit:${junit_version}"
+    androidTestCompile "org.mockito:mockito-core:${mockito_version}"
+    androidTestCompile "com.crittercism.dexmaker:dexmaker:${dexmaker_version}"
+    androidTestCompile "com.crittercism.dexmaker:dexmaker-mockito:${dexmaker_version}"
+    androidTestCompile "com.crittercism.dexmaker:dexmaker-dx:${dexmaker_version}"
+    debugCompile("com.metova:cappuccino:${cappuccino_version}") {
+        transitive = false
+    }
+    releaseCompile "com.metova:cappuccino-no-op:${cappuccino_version}"
+}
