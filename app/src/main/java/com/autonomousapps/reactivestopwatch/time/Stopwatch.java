@@ -13,39 +13,37 @@ import rx.schedulers.Schedulers;
 
 public class Stopwatch {
 
-    private static final long NOT_PAUSED = -1L;
-
-    private final TimeProvider timeProvider;
+    static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
 
     private Subscription subscription;
     private Scheduler scheduler = Schedulers.computation();
 
-    private long startTime = 0L;
-    private long pausedTime = NOT_PAUSED;
+    private boolean isPaused = false;
+    private long pausedTime = 0L;
 
-    public Stopwatch(@NonNull TimeProvider timeProvider) {
-        this.timeProvider = timeProvider;
+    public Stopwatch() {
     }
 
     public void start(@NonNull Action1<Long> action) {
-        startTime = timeProvider.now();
-
-        subscription = Observable.interval(1, TimeUnit.MILLISECONDS)
-                .startWith(0L)
-                .map(interval -> interval == 0 ? interval : timeProvider.now() - startTime - getPausedTime())
-                .filter(ignored -> pausedTime == NOT_PAUSED)
+        subscription = Observable.interval(1, TIME_UNIT, scheduler)
+                .map(tick -> tick + 1 - getPausedTime())
+                .filter(ignored -> isNotPaused())
                 .onBackpressureDrop()
                 .subscribeOn(scheduler)
                 .observeOn(scheduler)
                 .subscribe(action);
     }
 
-    private long getPausedTime() {
-        return pausedTime == NOT_PAUSED ? 0L : pausedTime;
+    private boolean isNotPaused() {
+        return !isPaused;
     }
 
-    public void pause() {
-        pausedTime = timeProvider.now() - startTime;
+    private long getPausedTime() {
+        return isPaused ? ++pausedTime : pausedTime;
+    }
+
+    public void togglePause() {
+        isPaused = !isPaused;
     }
 
     public void reset() {

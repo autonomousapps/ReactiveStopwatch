@@ -31,9 +31,12 @@ android {
     }
 }
 
+// Note the use of `annotationProcessor`. This is a drop-in replacement for the android-apt plugin, and its siblings.
+// See here: http://tools.android.com/tech-docs/jackandjill
 dependencies {
     def androidsupport_version = '24.1.1'
     def dagger_version = '2.6.1'
+    def autovalue_version = '1.2'
     def butterknife_version = '8.4.0'
 
     def junit_version = '4.12'
@@ -44,7 +47,6 @@ dependencies {
     def espresso_runner_version = '0.5'
     def cappuccino_version = '0.8.1'
 
-//    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "com.android.support:appcompat-v7:${androidsupport_version}"
 
     compile "com.jakewharton:butterknife:${butterknife_version}"
@@ -56,10 +58,11 @@ dependencies {
 
     // Dagger
     compile "com.google.dagger:dagger:${dagger_version}"
-//    apt "com.google.dagger:dagger-compiler:${dagger_version}"
-//    androidTestApt "com.google.dagger:dagger-compiler:${dagger_version}"
-    // This is a drop-in replacement for the android-apt plugin. See here: http://tools.android.com/tech-docs/jackandjill
     annotationProcessor "com.google.dagger:dagger-compiler:${dagger_version}"
+
+    // AutoValue
+    provided "com.google.auto.value:auto-value:${autovalue_version}"
+    annotationProcessor "com.google.auto.value:auto-value:${autovalue_version}"
 
     /*
      * Unit tests

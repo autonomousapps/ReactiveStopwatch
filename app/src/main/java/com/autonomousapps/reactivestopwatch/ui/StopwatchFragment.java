@@ -1,6 +1,7 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.R;
+import com.autonomousapps.reactivestopwatch.time.Stopwatch;
 import com.autonomousapps.reactivestopwatch.view.StopwatchView;
 
 import android.app.Fragment;
