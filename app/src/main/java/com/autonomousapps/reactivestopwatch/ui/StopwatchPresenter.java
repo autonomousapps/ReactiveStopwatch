@@ -61,7 +61,7 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
 
     @Override
     public void reset() {
-        stopwatch.togglePause();
+        stopwatch.reset();
     }
 
     @VisibleForTesting

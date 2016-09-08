@@ -11,8 +11,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import rx.Observable;
 import rx.schedulers.TestScheduler;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -20,7 +20,7 @@ public class StopwatchPresenterTest {
 
     @Mock Stopwatch stopwatch;
     @Mock StopwatchMvp.View view;
-    @Mock Observable<Long> mockObservable;
+    private final Observable<Long> testObservable = Observable.just(1L, 2L, 3L);
 
     private final TestScheduler testScheduler = new TestScheduler();
 
@@ -41,11 +41,48 @@ public class StopwatchPresenterTest {
 
     @Test
     public void startTicksMerrilyAway() throws Exception {
-        when(stopwatch.start()).thenReturn(mockObservable);
+        // Setup
+        when(stopwatch.start()).thenReturn(testObservable);
 
+        // Exercise (#start() subscribes, which causes source Observable to emit its items)
         stopwatchPresenter.start();
+        testScheduler.triggerActions();
 
+        // Verify
         verify(stopwatch).start();
-        // TODO how to use the mocked observable? Maybe use a real one and have it emit things...?
+        verify(view).onTick(0L); // #doOnSubscribe()
+        verify(view).onTick(1L);
+        verify(view).onTick(2L);
+        verify(view).onTick(3L);
+    }
+
+    @Test
+    public void detachingStopsViewInteractions() throws Exception {
+        // Setup
+        when(stopwatch.start()).thenReturn(testObservable);
+
+        // Exercise (#start() subscribes, which causes source Observable to emit its items)
+        stopwatchPresenter.detachView();
+        stopwatchPresenter.start();
+        testScheduler.triggerActions();
+
+        // Verify
+        verify(stopwatch).start();
+        verify(view).onTick(0L); // from attach
+        verifyNoMoreInteractions(view);
+    }
+
+    @Test
+    public void togglePauseTogglesPause() throws Exception {
+        stopwatchPresenter.togglePause();
+
+        verify(stopwatch).togglePause();
+    }
+
+    @Test
+    public void resetResets() throws Exception {
+        stopwatchPresenter.reset();
+
+        verify(stopwatch).reset();
     }
 }
