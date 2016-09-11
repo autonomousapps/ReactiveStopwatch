@@ -1,12 +1,14 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.R;
-import com.autonomousapps.reactivestopwatch.time.Stopwatch;
+import com.autonomousapps.reactivestopwatch.di.DaggerStopwatchComponent;
+import com.autonomousapps.reactivestopwatch.di.PresenterModule;
 import com.autonomousapps.reactivestopwatch.view.StopwatchView;
 
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +23,7 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
     public static String TAG = StopwatchFragment.class.getSimpleName();
 
     @BindView(R.id.stopwatch)
-    StopwatchView stopwatch;
+    StopwatchView stopwatchView;
 
     @Inject StopwatchMvp.Presenter presenter;
 
@@ -36,6 +38,10 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        DaggerStopwatchComponent.builder()
+                .presenterModule(new PresenterModule())
+                .build()
+                .inject(this);
     }
 
     @Nullable
@@ -48,7 +54,30 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
     }
 
     @Override
-    public void onTick(long tick) {
+    public void onResume() {
+        super.onResume();
+        presenter.attachView(this);
+        presenter.start();
+    }
 
+    // TODO detaching will actually kill the timer, but I don't want that. I just want it to stop updating the view
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        presenter.detachView();
+    }
+
+    @Override
+    public void onTick(long timeInMillis) {
+        logEverySecond(timeInMillis);
+        stopwatchView.setTime(timeInMillis);
+    }
+
+    // Because of backpressure, this will log AT MOST every second
+    private void logEverySecond(long timeInMillis) {
+        if (timeInMillis % 1000L == 0L) {
+            Log.d(TAG, "onTick(): " + timeInMillis);
+        }
     }
 }

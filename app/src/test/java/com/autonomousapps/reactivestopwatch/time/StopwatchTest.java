@@ -4,6 +4,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Random;
@@ -13,18 +15,22 @@ import rx.schedulers.TestScheduler;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StopwatchTest {
 
     private final TestScheduler testScheduler = new TestScheduler();
 
-    private final Stopwatch stopwatch = new Stopwatch();
+    private TestTimeProvider timeProvider;
+    private Stopwatch stopwatch;
 
     private final Random numberGenerator = new Random(1L);
 
     @Before
     public void setup() throws Exception {
+        timeProvider = new TestTimeProvider();
+        stopwatch = new Stopwatch(timeProvider);
         stopwatch.setScheduler(testScheduler);
     }
 
@@ -118,7 +124,7 @@ public class StopwatchTest {
         tick();
         assertThat(timeWatcher.getCurrentTime(), is(1L));
         stopwatch.togglePause();
-        advanceTimeBy(randomTick());
+        advanceTimeTo(randomTick());
 
         // Exercise
         stopwatch.togglePause();
@@ -137,7 +143,7 @@ public class StopwatchTest {
         assertThat(timeWatcher.getCurrentTime(), is(1L));
         // 1
         stopwatch.togglePause();
-        advanceTimeBy(randomTick());
+        advanceTimeTo(randomTick());
         // 2
         stopwatch.togglePause();
         tick();
@@ -146,7 +152,7 @@ public class StopwatchTest {
         // Exercise
         // 3
         stopwatch.togglePause();
-        advanceTimeBy(randomTick());
+        advanceTimeTo(randomTick(timeProvider.now()));
 
         // Verify
         assertThat(timeWatcher.getCurrentTime(), is(2L));
@@ -167,7 +173,7 @@ public class StopwatchTest {
     }
 
     @Test
-    public void callingLapATicksReturnsAShortLap() throws Exception {
+    public void callingLapAfterATickReturnsAShortLap() throws Exception {
         // Setup
         TimeWatcher timeWatcher = new TimeWatcher();
         stopwatch.start().subscribe(timeWatcher::onNext);
@@ -275,14 +281,25 @@ public class StopwatchTest {
     }
 
     private void advanceTimeBy(long time) {
+        timeProvider.advanceTimeBy(time);
         testScheduler.advanceTimeBy(time, Stopwatch.TIME_UNIT);
     }
 
-    private Long randomTick() {
+    private void advanceTimeTo(long time) {
+        timeProvider.advanceTimeTo(time);
+        testScheduler.advanceTimeTo(time, Stopwatch.TIME_UNIT);
+    }
+
+    private long randomTick() {
+        return randomTick(0L);
+    }
+
+    private long randomTick(long left) {
+        int max = 1_000_000;
         // I want the range clamped to [0, N), where N is sufficiently large to demonstrate the
         // robustness of the system, but not so large as to cause issues with the TestScheduler,
         // which attempts to trigger every action that gets queued when we advance time.
-        return (long) numberGenerator.nextInt(1_000_000);
+        return Math.min(max, left + numberGenerator.nextInt(max));
     }
 
     static class TimeWatcher {

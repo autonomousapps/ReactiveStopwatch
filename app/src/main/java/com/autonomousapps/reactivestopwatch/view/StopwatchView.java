@@ -21,4 +21,8 @@ public class StopwatchView extends TextView {
     public StopwatchView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
+
+    public void setTime(long timeInMillis) {
+        setText("" + timeInMillis);
+    }
 }

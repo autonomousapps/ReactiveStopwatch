@@ -20,8 +20,8 @@ public class StopwatchPresenterTest {
 
     @Mock Stopwatch stopwatch;
     @Mock StopwatchMvp.View view;
-    private final Observable<Long> testObservable = Observable.just(1L, 2L, 3L);
 
+    private final Observable<Long> testObservable = Observable.just(1L, 2L, 3L);
     private final TestScheduler testScheduler = new TestScheduler();
 
     private StopwatchPresenter stopwatchPresenter;
