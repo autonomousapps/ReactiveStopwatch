@@ -1,22 +1,19 @@
 package com.autonomousapps.reactivestopwatch.di;
 
 import com.autonomousapps.reactivestopwatch.time.Stopwatch;
+import com.autonomousapps.reactivestopwatch.time.StopwatchImpl;
 import com.autonomousapps.reactivestopwatch.time.SystemTimeProvider;
 import com.autonomousapps.reactivestopwatch.time.TimeProvider;
 
+import dagger.Binds;
 import dagger.Module;
-import dagger.Provides;
 
 @Module
-public class StopwatchModule {
+public abstract class StopwatchModule {
 
-    @Provides
-    public TimeProvider providesTimeProvider() {
-        return new SystemTimeProvider();
-    }
+    @Binds
+    public abstract TimeProvider bindsTimeProvider(SystemTimeProvider systemTimeProvider);
 
-    @Provides
-    public Stopwatch providesStopwatch(TimeProvider timeProvider) {
-        return new Stopwatch(timeProvider);
-    }
+    @Binds
+    public abstract Stopwatch bindsStopwatch(StopwatchImpl stopwatch);
 }

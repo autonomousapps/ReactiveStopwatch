@@ -1,6 +1,7 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.time.Stopwatch;
+import com.autonomousapps.reactivestopwatch.time.StopwatchImpl;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
@@ -28,7 +29,7 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
     private Scheduler observingScheduler = AndroidSchedulers.mainThread();
 
     @Inject
-    public StopwatchPresenter(@NonNull Stopwatch stopwatch) {
+    public StopwatchPresenter(@NonNull StopwatchImpl stopwatch) {
         this.stopwatch = stopwatch;
     }
 

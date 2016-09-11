@@ -2,8 +2,7 @@ package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.R;
 import com.autonomousapps.reactivestopwatch.di.DaggerStopwatchComponent;
-import com.autonomousapps.reactivestopwatch.di.PresenterModule;
-import com.autonomousapps.reactivestopwatch.view.StopwatchView;
+import com.autonomousapps.reactivestopwatch.view.TimeTeller;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -22,8 +21,9 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
 
     public static String TAG = StopwatchFragment.class.getSimpleName();
 
+    // TODO do I want to bind this as a StopwatchView or as a TimeTeller?
     @BindView(R.id.stopwatch)
-    StopwatchView stopwatchView;
+    TimeTeller stopwatchView;
 
     @Inject StopwatchMvp.Presenter presenter;
 
@@ -38,10 +38,8 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        DaggerStopwatchComponent.builder()
-                .presenterModule(new PresenterModule())
-                .build()
-                .inject(this);
+
+        DaggerStopwatchComponent.create().inject(this);
     }
 
     @Nullable
@@ -61,7 +59,6 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
     }
 
     // TODO detaching will actually kill the timer, but I don't want that. I just want it to stop updating the view
-
     @Override
     public void onPause() {
         super.onPause();

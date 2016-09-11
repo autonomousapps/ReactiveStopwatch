@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-public class StopwatchView extends TextView {
+public class StopwatchView extends TextView implements TimeTeller {
 
     public StopwatchView(Context context) {
         super(context);
@@ -22,6 +22,7 @@ public class StopwatchView extends TextView {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
+    @Override
     public void setTime(long timeInMillis) {
         setText("" + timeInMillis);
     }

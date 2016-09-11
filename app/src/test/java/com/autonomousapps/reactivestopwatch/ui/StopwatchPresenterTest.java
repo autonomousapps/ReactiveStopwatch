@@ -1,6 +1,6 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
-import com.autonomousapps.reactivestopwatch.time.Stopwatch;
+import com.autonomousapps.reactivestopwatch.time.StopwatchImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class StopwatchPresenterTest {
 
-    @Mock Stopwatch stopwatch;
+    @Mock StopwatchImpl stopwatch;
     @Mock StopwatchMvp.View view;
 
     private final Observable<Long> testObservable = Observable.just(1L, 2L, 3L);

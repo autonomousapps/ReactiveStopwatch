@@ -4,8 +4,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Random;
@@ -15,7 +13,6 @@ import rx.schedulers.TestScheduler;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StopwatchTest {
@@ -23,14 +20,14 @@ public class StopwatchTest {
     private final TestScheduler testScheduler = new TestScheduler();
 
     private TestTimeProvider timeProvider;
-    private Stopwatch stopwatch;
+    private StopwatchImpl stopwatch;
 
     private final Random numberGenerator = new Random(1L);
 
     @Before
     public void setup() throws Exception {
         timeProvider = new TestTimeProvider();
-        stopwatch = new Stopwatch(timeProvider);
+        stopwatch = new StopwatchImpl(timeProvider);
         stopwatch.setScheduler(testScheduler);
     }
 
@@ -282,12 +279,12 @@ public class StopwatchTest {
 
     private void advanceTimeBy(long time) {
         timeProvider.advanceTimeBy(time);
-        testScheduler.advanceTimeBy(time, Stopwatch.TIME_UNIT);
+        testScheduler.advanceTimeBy(time, StopwatchImpl.TIME_UNIT);
     }
 
     private void advanceTimeTo(long time) {
         timeProvider.advanceTimeTo(time);
-        testScheduler.advanceTimeTo(time, Stopwatch.TIME_UNIT);
+        testScheduler.advanceTimeTo(time, StopwatchImpl.TIME_UNIT);
     }
 
     private long randomTick() {
