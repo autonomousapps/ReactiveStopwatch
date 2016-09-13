@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Scheduler;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
 
 public class StopwatchImpl implements Stopwatch {
 
@@ -21,10 +22,10 @@ public class StopwatchImpl implements Stopwatch {
 
     private final List<Lap> laps = new ArrayList<>();
 
-    private boolean isReset = false;
-    private boolean isPaused = false;
+    private PublishSubject<Void> stop = PublishSubject.create();
+    private volatile boolean isPaused = false;
 
-    private long startTime = 0L;
+    private volatile long startTime = 0L;
     private long pausedTime = 0L;
 
     private final TimeProvider timeProvider;
@@ -37,14 +38,14 @@ public class StopwatchImpl implements Stopwatch {
     @NonNull
     @Override
     public Observable<Long> start() {
-        isReset = false;
         startTime = timeProvider.now();
 
+        // Using Observable.interval() to produce events as fast as possible. TODO Is there a better way?
         return Observable.interval(1, TIME_UNIT, scheduler)
                 .onBackpressureDrop()
-                .takeWhile(ignored -> !isReset)
-                .map(ignored -> timeProvider.now() - startTime)
-                .filter(ignored -> isNotPaused());
+                .takeUntil(stop)
+                .filter(ignored -> isNotPaused())
+                .map(ignored -> timeProvider.now() - startTime);
     }
 
     private boolean isNotPaused() {
@@ -52,18 +53,20 @@ public class StopwatchImpl implements Stopwatch {
     }
 
     @Override
-    public void togglePause() {
+    public boolean togglePause() {
         isPaused = !isPaused;
         if (isPaused) {
             pausedTime = timeProvider.now();
         } else {
             startTime += timeProvider.now() - pausedTime;
         }
+        return isPaused;
     }
 
     @Override
     public void reset() {
-        isReset = true;
+        isPaused = false;
+        stop.onNext(null);
     }
 
     // TODO do I need the list of laps?

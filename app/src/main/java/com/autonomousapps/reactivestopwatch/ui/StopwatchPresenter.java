@@ -11,9 +11,9 @@ import javax.inject.Inject;
 
 import rx.Scheduler;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
 
 public class StopwatchPresenter implements StopwatchMvp.Presenter {
 
@@ -23,7 +23,7 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
 
     private StopwatchMvp.View view;
 
-    private final PublishSubject<Long> tickPublisher = PublishSubject.create();
+    private Subscription stopwatchSubscription = null;
 
     private Scheduler subscribingScheduler = Schedulers.computation();
     private Scheduler observingScheduler = AndroidSchedulers.mainThread();
@@ -36,13 +36,36 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
     @Override
     public void attachView(@NonNull StopwatchMvp.View view) {
         Log.d(TAG, "attachView()");
-
         this.view = view;
-        tickPublisher.asObservable()
-                .takeWhile(ignored -> this.view != null)
+    }
+
+    @Override
+    public void detachView() {
+        Log.d(TAG, "detachView()");
+        view = null;
+    }
+
+    @Override
+    public void startOrPause() {
+        Log.d(TAG, "startOrPause()");
+
+        if (stopwatchSubscription != null) {
+            togglePause();
+        } else {
+            start();
+        }
+    }
+
+    @Override
+    public void start() {
+        Log.d(TAG, "start()");
+
+        stopwatchSubscription = stopwatch.start()
+                .takeWhile(ignored -> getView() != null) // TODO use takeUntil()?
                 .onBackpressureDrop()
+                .subscribeOn(subscribingScheduler)
                 .observeOn(observingScheduler)
-                .doOnSubscribe(() -> this.view.onTick(0L))
+//                .doOnSubscribe(() -> getView().onTick(0L))
                 .subscribe(new Subscriber<Long>() {
                     @Override
                     public void onCompleted() {
@@ -56,40 +79,41 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
 
                     @Override
                     public void onNext(Long tick) {
-                        view.onTick(tick);
+                        getView().onTick(tick);
                         request(1L);
                     }
                 });
-    }
 
-    @Override
-    public void detachView() {
-        Log.d(TAG, "detachView()");
-
-        view = null;
-    }
-
-    @Override
-    public void start() {
-        Log.d(TAG, "start()");
-
-        stopwatch.start()
-                .subscribeOn(subscribingScheduler)
-                .subscribe(this::onTick);
-    }
-
-    private void onTick(long tick) {
-        tickPublisher.onNext(tick);
+        view.onStopwatchStarted(); // TODO test this
     }
 
     @Override
     public void togglePause() {
-        stopwatch.togglePause();
+        Log.d(TAG, "togglePause()");
+
+        // TODO I'm not sure about this method returning a value. Either tracking in the presenter or having an isPaused() method in the stopwatch might be better
+        boolean isPaused = stopwatch.togglePause();
+
+        // TODO test this
+        if (isPaused) {
+            view.onStopwatchPaused();
+        } else {
+            view.onStopwatchStarted();
+        }
     }
 
     @Override
     public void reset() {
         stopwatch.reset();
+        if (stopwatchSubscription != null) { // TODO test this
+            stopwatchSubscription.unsubscribe();
+            stopwatchSubscription = null;
+        }
+        view.onStopwatchPaused();
+    }
+
+    StopwatchMvp.View getView() {
+        return view;
     }
 
     @VisibleForTesting

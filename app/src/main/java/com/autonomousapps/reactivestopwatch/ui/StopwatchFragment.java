@@ -11,11 +11,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
 
@@ -23,7 +25,13 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
 
     // TODO do I want to bind this as a StopwatchView or as a TimeTeller?
     @BindView(R.id.stopwatch)
-    TimeTeller stopwatchView;
+    TimeTeller timeTeller;
+
+    @BindView(R.id.btn_reset)
+    Button resetButton;
+
+    @BindView(R.id.btn_start)
+    Button startPauseButton;
 
     @Inject StopwatchMvp.Presenter presenter;
 
@@ -55,7 +63,6 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
     public void onResume() {
         super.onResume();
         presenter.attachView(this);
-        presenter.start();
     }
 
     // TODO detaching will actually kill the timer, but I don't want that. I just want it to stop updating the view
@@ -68,13 +75,38 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
     @Override
     public void onTick(long timeInMillis) {
         logEverySecond(timeInMillis);
-        stopwatchView.setTime(timeInMillis);
+        timeTeller.setTime(timeInMillis);
     }
+
+    private long lastTimeLogged = -1L;
 
     // Because of backpressure, this will log AT MOST every second
     private void logEverySecond(long timeInMillis) {
-        if (timeInMillis % 1000L == 0L) {
+        if (timeInMillis % 1000L == 0L && timeInMillis != lastTimeLogged) {
+            lastTimeLogged = timeInMillis; // sometimes we get two consecutive ticks with the same time.
             Log.d(TAG, "onTick(): " + timeInMillis);
         }
+    }
+
+    @Override
+    public void onStopwatchStarted() {
+        startPauseButton.setText(getString(R.string.pause));
+    }
+
+    @Override
+    public void onStopwatchPaused() {
+        startPauseButton.setText(getString(R.string.start));
+    }
+
+    @OnClick(R.id.btn_start)
+    void onClickStartPause() {
+        presenter.startOrPause();
+    }
+
+    @OnClick(R.id.btn_reset)
+    void onClickReset() {
+        presenter.reset();
+        timeTeller.setTime(0L);
+        startPauseButton.setText(getString(R.string.start));
     }
 }

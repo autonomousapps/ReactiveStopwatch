@@ -9,7 +9,7 @@ public interface Stopwatch {
     @NonNull
     Observable<Long> start();
 
-    void togglePause();
+    boolean togglePause();
 
     void reset();
 

@@ -7,6 +7,10 @@ public interface StopwatchMvp {
     interface View {
 
         void onTick(long tick);
+
+        void onStopwatchStarted();
+
+        void onStopwatchPaused();
     }
 
     interface Presenter {
@@ -16,6 +20,8 @@ public interface StopwatchMvp {
         void detachView();
 
         void start();
+
+        void startOrPause();
 
         void togglePause();
 
