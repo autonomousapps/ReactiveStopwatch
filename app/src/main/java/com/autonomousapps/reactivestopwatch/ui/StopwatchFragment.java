@@ -6,12 +6,15 @@ import com.autonomousapps.reactivestopwatch.view.TimeTeller;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -23,7 +26,6 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
 
     public static String TAG = StopwatchFragment.class.getSimpleName();
 
-    // TODO do I want to bind this as a StopwatchView or as a TimeTeller?
     @BindView(R.id.stopwatch)
     TimeTeller timeTeller;
 
@@ -65,23 +67,22 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
         presenter.attachView(this);
     }
 
-    // TODO detaching will actually kill the timer, but I don't want that. I just want it to stop updating the view
     @Override
     public void onPause() {
-        super.onPause();
         presenter.detachView();
+        super.onPause();
     }
 
     @Override
     public void onTick(long timeInMillis) {
         logEverySecond(timeInMillis);
-        timeTeller.setTime(timeInMillis);
+        timeTeller.tellTime(timeInMillis);
     }
 
     private long lastTimeLogged = -1L;
 
     // Because of backpressure, this will log AT MOST every second
-    private void logEverySecond(long timeInMillis) {
+    private void logEverySecond(long timeInMillis) { // TODO use TimeUnit instead of assuming callers are passing correct units?
         if (timeInMillis % 1000L == 0L && timeInMillis != lastTimeLogged) {
             lastTimeLogged = timeInMillis; // sometimes we get two consecutive ticks with the same time.
             Log.d(TAG, "onTick(): " + timeInMillis);
@@ -90,12 +91,16 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
 
     @Override
     public void onStopwatchStarted() {
-        startPauseButton.setText(getString(R.string.pause));
+        setStartPauseButtonText(getString(R.string.pause));
     }
 
     @Override
     public void onStopwatchPaused() {
-        startPauseButton.setText(getString(R.string.start));
+        setStartPauseButtonText(getString(R.string.start));
+    }
+
+    private void setStartPauseButtonText(@NonNull String text) {
+        startPauseButton.setText(text);
     }
 
     @OnClick(R.id.btn_start)
@@ -106,7 +111,7 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
     @OnClick(R.id.btn_reset)
     void onClickReset() {
         presenter.reset();
-        timeTeller.setTime(0L);
-        startPauseButton.setText(getString(R.string.start));
+        timeTeller.tellTime(0L);
+        setStartPauseButtonText(getString(R.string.start));
     }
 }

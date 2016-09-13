@@ -22,7 +22,7 @@ public class StopwatchImpl implements Stopwatch {
 
     private final List<Lap> laps = new ArrayList<>();
 
-    private PublishSubject<Void> stop = PublishSubject.create();
+    private final PublishSubject<Void> stop = PublishSubject.create();
     private volatile boolean isPaused = false;
 
     private volatile long startTime = 0L;

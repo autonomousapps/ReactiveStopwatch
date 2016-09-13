@@ -30,7 +30,7 @@ public class StopwatchView extends TextView implements TimeTeller {
     }
 
     @Override
-    public void setTime(long timeInMillis) {
+    public void tellTime(long timeInMillis) {
         setText("" + timeInMillis);
     }
 }

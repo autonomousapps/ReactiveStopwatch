@@ -5,5 +5,5 @@ public interface TimeTeller {
     /**
      * Sets the current time to {@param timeInMillis}.
      */
-    void setTime(long timeInMillis);
+    void tellTime(long timeInMillis);
 }

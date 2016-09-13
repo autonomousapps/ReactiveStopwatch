@@ -60,12 +60,12 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
     public void start() {
         Log.d(TAG, "start()");
 
+        getView().onStopwatchStarted(); // TODO test this
+
         stopwatchSubscription = stopwatch.start()
-                .takeWhile(ignored -> getView() != null) // TODO use takeUntil()?
                 .onBackpressureDrop()
                 .subscribeOn(subscribingScheduler)
                 .observeOn(observingScheduler)
-//                .doOnSubscribe(() -> getView().onTick(0L))
                 .subscribe(new Subscriber<Long>() {
                     @Override
                     public void onCompleted() {
@@ -80,11 +80,9 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
                     @Override
                     public void onNext(Long tick) {
                         getView().onTick(tick);
-                        request(1L);
+                        request(1L); // "reactive pull backpressure". See https://github.com/ReactiveX/RxJava/wiki/Backpressure
                     }
                 });
-
-        view.onStopwatchStarted(); // TODO test this
     }
 
     @Override
@@ -96,9 +94,9 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
 
         // TODO test this
         if (isPaused) {
-            view.onStopwatchPaused();
+            getView().onStopwatchPaused();
         } else {
-            view.onStopwatchStarted();
+            getView().onStopwatchStarted();
         }
     }
 
@@ -109,9 +107,10 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
             stopwatchSubscription.unsubscribe();
             stopwatchSubscription = null;
         }
-        view.onStopwatchPaused();
+        getView().onStopwatchPaused();
     }
 
+    // TODO Nullable annotation?
     StopwatchMvp.View getView() {
         return view;
     }
