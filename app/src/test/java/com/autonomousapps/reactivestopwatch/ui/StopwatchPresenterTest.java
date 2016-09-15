@@ -1,7 +1,9 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
+import com.autonomousapps.reactivestopwatch.mvp.ViewNotAttachedException;
 import com.autonomousapps.reactivestopwatch.time.StopwatchImpl;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import rx.Observable;
 import rx.schedulers.TestScheduler;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -34,6 +37,11 @@ public class StopwatchPresenterTest {
         stopwatchPresenter.attachView(view);
     }
 
+    @After
+    public void teardown() throws Exception {
+        stopwatchPresenter.detachView();
+    }
+
     @Test
     public void startTicksMerrilyAway() throws Exception {
         // Setup
@@ -51,7 +59,7 @@ public class StopwatchPresenterTest {
         verify(view).onTick(3L);
     }
 
-//    @Test // TODO test stop procedure, but it'll be different shortly
+    //    @Test // TODO test stop procedure, but it'll be different shortly
     public void detachingStopsViewInteractions() throws Exception {
         // Setup
         when(stopwatch.start()).thenReturn(testObservable);
@@ -79,5 +87,19 @@ public class StopwatchPresenterTest {
         stopwatchPresenter.reset();
 
         verify(stopwatch).reset();
+    }
+
+    @Test
+    public void resetThrowsExceptionWhenNotAttached() throws Exception {
+        // Setup
+        stopwatchPresenter.detachView();
+
+        // Exercise
+        try {
+            stopwatchPresenter.reset();
+            fail();
+        } catch (ViewNotAttachedException e) {
+            // Success!
+        }
     }
 }

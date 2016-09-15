@@ -1,9 +1,11 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
+import com.autonomousapps.reactivestopwatch.mvp.ViewNotAttachedException;
 import com.autonomousapps.reactivestopwatch.time.Stopwatch;
 import com.autonomousapps.reactivestopwatch.time.StopwatchImpl;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
@@ -15,6 +17,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+@UiThread
 public class StopwatchPresenter implements StopwatchMvp.Presenter {
 
     private static final String TAG = StopwatchPresenter.class.getSimpleName();
@@ -66,6 +69,7 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
                 .onBackpressureDrop()
                 .subscribeOn(subscribingScheduler)
                 .observeOn(observingScheduler)
+                .filter(ignored -> isAttached())
                 .subscribe(new Subscriber<Long>() {
                     @Override
                     public void onCompleted() {
@@ -102,6 +106,8 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
 
     @Override
     public void reset() {
+        Log.d(TAG, "reset()");
+
         stopwatch.reset();
         if (stopwatchSubscription != null) { // TODO test this
             stopwatchSubscription.unsubscribe();
@@ -110,9 +116,16 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
         getView().onStopwatchPaused();
     }
 
-    // TODO Nullable annotation?
+    @NonNull
     StopwatchMvp.View getView() {
+        if (view == null) {
+            throw new ViewNotAttachedException();
+        }
         return view;
+    }
+
+    private boolean isAttached() {
+        return view != null;
     }
 
     @VisibleForTesting
