@@ -2,6 +2,7 @@ package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.R;
 import com.autonomousapps.reactivestopwatch.di.DaggerStopwatchComponent;
+import com.autonomousapps.reactivestopwatch.di.DaggerUtil;
 import com.autonomousapps.reactivestopwatch.view.TimeTeller;
 
 import android.app.Fragment;
@@ -49,7 +50,7 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        DaggerStopwatchComponent.create().inject(this);
+        DaggerUtil.INSTANCE.getStopwatchComponent().inject(this);
     }
 
     @Nullable
