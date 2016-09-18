@@ -8,7 +8,7 @@ import org.junit.Before;
 
 import android.support.annotation.CallSuper;
 
-public class BaseMockingEspressoTest extends BaseEspressoTest {
+public abstract class AbstractMockedDependenciesTest extends AbstractAnimationDisablingTest {
 
     protected TestStopwatchComponent testComponent;
 

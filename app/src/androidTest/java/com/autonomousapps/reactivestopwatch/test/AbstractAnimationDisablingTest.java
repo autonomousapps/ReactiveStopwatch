@@ -7,7 +7,7 @@ import org.junit.BeforeClass;
 
 import android.support.test.InstrumentationRegistry;
 
-public class BaseEspressoTest {
+public abstract class AbstractAnimationDisablingTest {
 
     @BeforeClass
     public static void disableAnimations() {

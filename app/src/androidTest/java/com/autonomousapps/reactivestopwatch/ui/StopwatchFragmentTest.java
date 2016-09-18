@@ -1,7 +1,7 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.R;
-import com.autonomousapps.reactivestopwatch.test.BaseMockingEspressoTest;
+import com.autonomousapps.reactivestopwatch.test.AbstractMockedDependenciesTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,7 +17,7 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
-public class StopwatchFragmentTest extends BaseMockingEspressoTest {
+public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
 
     @Inject StopwatchMvp.Presenter stopwatchPresenter;
 
