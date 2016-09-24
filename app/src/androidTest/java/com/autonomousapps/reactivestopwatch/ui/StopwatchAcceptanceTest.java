@@ -179,7 +179,7 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
         // Verify
         assertThat(stopwatch.getText(), is("00:00:00.0"));
-        assertThat(startPauseBtn.getText(), is(START_TEXT));
+        assertThat(startPauseBtn.getText(), equalToIgnoringCase(START_TEXT));
     }
 
     private void checkPreconditions() throws Exception {

@@ -1,6 +1,9 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
+import com.autonomousapps.reactivestopwatch.view.TimeTeller;
+
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 public interface StopwatchMvp {
 
@@ -11,6 +14,12 @@ public interface StopwatchMvp {
         void onStopwatchStarted();
 
         void onStopwatchPaused();
+
+        /*
+         * Manual injection for testing
+         */
+        @VisibleForTesting
+        void setTimeTeller(@NonNull TimeTeller timeTeller);
     }
 
     interface Presenter {

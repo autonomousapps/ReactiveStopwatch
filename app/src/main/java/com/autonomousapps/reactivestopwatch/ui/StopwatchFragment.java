@@ -1,7 +1,6 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.R;
-import com.autonomousapps.reactivestopwatch.di.DaggerStopwatchComponent;
 import com.autonomousapps.reactivestopwatch.di.DaggerUtil;
 import com.autonomousapps.reactivestopwatch.view.TimeTeller;
 
@@ -9,13 +8,12 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -114,5 +112,11 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
         presenter.reset();
         timeTeller.tellTime(0L);
         setStartPauseButtonText(getString(R.string.start));
+    }
+
+    @VisibleForTesting
+    @Override
+    public void setTimeTeller(@NonNull TimeTeller timeTeller) {
+        this.timeTeller = timeTeller;
     }
 }
