@@ -86,16 +86,21 @@ dependencies {
     androidTestCompile "com.android.support.test.espresso:espresso-web:${espresso_core_version}"
     androidTestCompile "com.android.support.test.espresso:espresso-intents:${espresso_core_version}"
     androidTestCompile("com.android.support.test.espresso:espresso-contrib:2.0") {
-        exclude group: "com.android.support", module: "appcompat"
-        exclude group: "com.android.support", module: "support-v4"
+        exclude module: "appcompat"
+        exclude module: "support-v4"
         exclude module: "recyclerview-v7"
     }
+    androidTestCompile "com.android.support.test.uiautomator:uiautomator-v18:2.1.2"
     androidTestCompile "org.hamcrest:hamcrest-library:${hamcrest_version}"
     androidTestCompile "junit:junit:${junit_version}"
     androidTestCompile "org.mockito:mockito-core:${mockito_version}"
     androidTestCompile "com.crittercism.dexmaker:dexmaker:${dexmaker_version}"
     androidTestCompile "com.crittercism.dexmaker:dexmaker-mockito:${dexmaker_version}"
     androidTestCompile "com.crittercism.dexmaker:dexmaker-dx:${dexmaker_version}"
+    androidTestCompile("org.awaitility:awaitility:2.0.0") {
+        transitive = false
+    } // for testing asynchronous code
+
     debugCompile("com.metova:cappuccino:${cappuccino_version}") {
         transitive = false
     }
