@@ -31,6 +31,10 @@ public class StopwatchView extends TextView implements TimeTeller {
 
     @SuppressLint("SetTextI18n")
     private void init() {
+        if (isInEditMode()) {
+            return;
+        }
+
         setText("00:00:00.0");
     }
 
