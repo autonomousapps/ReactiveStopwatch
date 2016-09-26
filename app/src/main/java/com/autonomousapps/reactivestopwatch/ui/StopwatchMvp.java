@@ -28,11 +28,7 @@ public interface StopwatchMvp {
 
         void detachView();
 
-        void start();
-
         void startOrPause();
-
-        void togglePause();
 
         void reset();
     }

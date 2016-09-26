@@ -110,6 +110,8 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
     @OnClick(R.id.btn_reset)
     void onClickReset() {
         presenter.reset();
+
+        // TODO these two calls should be made from presenter
         timeTeller.tellTime(0L);
         setStartPauseButtonText(getString(R.string.start));
     }

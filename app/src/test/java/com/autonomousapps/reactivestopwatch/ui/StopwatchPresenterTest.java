@@ -14,6 +14,9 @@ import rx.Observable;
 import rx.schedulers.TestScheduler;
 
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -43,17 +46,67 @@ public class StopwatchPresenterTest {
     }
 
     @Test
+    public void startOrPauseStartsOnFirstCall() throws Exception {
+        // Setup
+        when(stopwatch.start()).thenReturn(testObservable);
+
+        // Exercise
+        stopwatchPresenter.startOrPause();
+
+        // Verify
+        verify(view).onStopwatchStarted();
+    }
+
+    @Test
+    public void startOrPausePausesOnSubsequentCalls() throws Exception {
+        // Setup
+        when(stopwatch.start()).thenReturn(testObservable);
+        when(stopwatch.togglePause()).thenReturn(true);
+
+        stopwatchPresenter.startOrPause();
+        verify(view).onStopwatchStarted();
+
+        // Exercise
+        stopwatchPresenter.startOrPause();
+
+        // Verify
+        verify(stopwatch).togglePause();
+        verify(view).onStopwatchPaused();
+    }
+
+    @Test
+    public void pausingTwiceUnpauses() throws Exception {
+        // Setup
+        when(stopwatch.start()).thenReturn(testObservable);
+        when(stopwatch.togglePause())
+                .thenReturn(true)
+                .thenReturn(false);
+
+        stopwatchPresenter.startOrPause();
+        verify(view).onStopwatchStarted();
+
+        stopwatchPresenter.startOrPause();
+        verify(stopwatch).togglePause();
+        verify(view).onStopwatchPaused();
+
+        // Exercise
+        stopwatchPresenter.startOrPause();
+
+        // Verify
+        verify(view, times(2)).onStopwatchStarted();
+    }
+
+    @Test
     public void startTicksMerrilyAway() throws Exception {
         // Setup
         when(stopwatch.start()).thenReturn(testObservable);
 
         // Exercise (#start() subscribes, which causes source Observable to emit its items)
-        stopwatchPresenter.start();
+        stopwatchPresenter.startOrPause();
         testScheduler.triggerActions();
 
         // Verify
         verify(stopwatch).start();
-//        verify(view).onTick(0L); // #doOnSubscribe()
         verify(view).onTick(1L);
         verify(view).onTick(2L);
         verify(view).onTick(3L);
@@ -64,29 +117,31 @@ public class StopwatchPresenterTest {
         // Setup
         when(stopwatch.start()).thenReturn(testObservable);
 
-        // Exercise (#start() subscribes, which causes source Observable to emit its items)
+        // Exercise (#start() subscribes, which causes source Observable to emit its items if the TestScheduler is cool with that)
         stopwatchPresenter.detachView();
-        stopwatchPresenter.start();
+        stopwatchPresenter.startOrPause();
         testScheduler.triggerActions();
 
         // Verify
         verify(stopwatch).start();
-//        verify(view).onTick(0L); // from attach
         verifyNoMoreInteractions(view);
     }
 
     @Test
-    public void togglePauseTogglesPause() throws Exception {
-        stopwatchPresenter.togglePause();
+    public void resetResetsAndStopsNewEvents() throws Exception {
+        // Setup
+        when(stopwatch.start()).thenReturn(testObservable);
+        stopwatchPresenter.startOrPause();
+        verify(view).onStopwatchStarted();
 
-        verify(stopwatch).togglePause();
-    }
-
-    @Test
-    public void resetResets() throws Exception {
+        // Exercise
         stopwatchPresenter.reset();
+        testScheduler.triggerActions();
 
+        // Verify
         verify(stopwatch).reset();
+        verify(view).onStopwatchPaused();
+        verify(view, never()).onTick(anyLong());
     }
 
     @Test

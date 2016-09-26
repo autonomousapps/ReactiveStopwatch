@@ -51,18 +51,17 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
     public void startOrPause() {
         Log.d(TAG, "startOrPause()");
 
-        if (stopwatchSubscription != null) {
-            togglePause();
-        } else {
+        if (stopwatchSubscription == null) {
             start();
+        } else {
+            togglePause();
         }
     }
 
-    @Override
-    public void start() {
+    private void start() {
         Log.d(TAG, "start()");
 
-        getView().onStopwatchStarted(); // TODO test this
+        getView().onStopwatchStarted();
 
         stopwatchSubscription = stopwatch.start()
                 .onBackpressureDrop()
@@ -88,14 +87,12 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
                 });
     }
 
-    @Override
-    public void togglePause() {
+    private void togglePause() {
         Log.d(TAG, "togglePause()");
 
         // TODO I'm not sure about this method returning a value. Either tracking in the presenter or having an isPaused() method in the stopwatch might be better
         boolean isPaused = stopwatch.togglePause();
 
-        // TODO test this
         if (isPaused) {
             getView().onStopwatchPaused();
         } else {
@@ -108,7 +105,7 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
         Log.d(TAG, "reset()");
 
         stopwatch.reset();
-        if (stopwatchSubscription != null) { // TODO test this
+        if (stopwatchSubscription != null) {
             stopwatchSubscription.unsubscribe();
             stopwatchSubscription = null;
         }
