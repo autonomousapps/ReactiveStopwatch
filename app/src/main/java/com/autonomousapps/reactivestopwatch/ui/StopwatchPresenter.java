@@ -31,7 +31,7 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
     private Scheduler observingScheduler = AndroidSchedulers.mainThread();
 
     @Inject
-    public StopwatchPresenter(@NonNull Stopwatch stopwatch) {
+    StopwatchPresenter(@NonNull Stopwatch stopwatch) {
         this.stopwatch = stopwatch;
     }
 
@@ -112,7 +112,7 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
     }
 
     @NonNull
-    StopwatchMvp.View getView() {
+    private StopwatchMvp.View getView() {
         if (view == null) {
             throw new ViewNotAttachedException();
         }

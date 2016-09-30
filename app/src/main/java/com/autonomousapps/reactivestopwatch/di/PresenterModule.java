@@ -9,7 +9,7 @@ import dagger.Module;
 @Module(includes = {
         StopwatchModule.class
 })
-public abstract class PresenterModule {
+abstract class PresenterModule {
 
     @Binds
     public abstract StopwatchMvp.Presenter bindStopwatchPresenter(StopwatchPresenter stopwatchPresenter);

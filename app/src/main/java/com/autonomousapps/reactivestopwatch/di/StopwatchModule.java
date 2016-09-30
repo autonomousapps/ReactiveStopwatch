@@ -2,7 +2,6 @@ package com.autonomousapps.reactivestopwatch.di;
 
 import com.autonomousapps.reactivestopwatch.time.RemoteStopwatch;
 import com.autonomousapps.reactivestopwatch.time.Stopwatch;
-import com.autonomousapps.reactivestopwatch.time.StopwatchImpl;
 import com.autonomousapps.reactivestopwatch.time.SystemTimeProvider;
 import com.autonomousapps.reactivestopwatch.time.TimeProvider;
 
@@ -12,7 +11,7 @@ import dagger.Module;
 @Module(includes = {
         ContextModule.class
 })
-public abstract class StopwatchModule {
+abstract class StopwatchModule {
 
     @Binds
     public abstract TimeProvider bindsTimeProvider(SystemTimeProvider systemTimeProvider);

@@ -10,17 +10,17 @@ import dagger.Provides;
 import static org.mockito.Mockito.mock;
 
 @Module
-public class TestModule {
+class TestModule {
 
     private StopwatchMvp.Presenter stopwatchPresenter;
 
-    public TestModule() {
+    TestModule() {
         stopwatchPresenter = mock(StopwatchMvp.Presenter.class);
     }
 
     @Singleton
     @Provides
-    public StopwatchMvp.Presenter providesStopwatchPresenter() {
+    StopwatchMvp.Presenter providesStopwatchPresenter() {
         return stopwatchPresenter;
     }
 }

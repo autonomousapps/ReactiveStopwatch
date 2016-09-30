@@ -33,7 +33,7 @@ public class RemoteStopwatch implements Stopwatch, AutoCloseable {
     private CompositeSubscription subscriptions;
 
     @Inject
-    public RemoteStopwatch(@NonNull Context context) {
+    RemoteStopwatch(@NonNull Context context) {
         this.context = context;
 
         subscriptions = new CompositeSubscription();
@@ -66,7 +66,7 @@ public class RemoteStopwatch implements Stopwatch, AutoCloseable {
                 remoteStopwatchService -> {
                     try {
                         // Start the remote stopwatch, which is contained by the remote Service
-                        // Passing in the listener for `tick` events to communicate back across process boundaries. TODO rename listener
+                        // Passing in the listener for `tick` events to communicate back across process boundaries.
                         remoteStopwatchService.start(new IStopwatchTickListener.Stub() {
 
                             @Override
@@ -86,7 +86,6 @@ public class RemoteStopwatch implements Stopwatch, AutoCloseable {
 
     @Override
     public void togglePause() {
-        // TODO implement
         try {
             // TODO null-check
             remoteService.togglePause();
@@ -108,7 +107,6 @@ public class RemoteStopwatch implements Stopwatch, AutoCloseable {
 
     @Override
     public void reset() {
-        // TODO implement
         try {
             // TODO null-check
             remoteService.reset();

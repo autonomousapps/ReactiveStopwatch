@@ -21,6 +21,7 @@ public class StopwatchService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d(TAG, "onCreate()");
         stopwatch = new StopwatchImpl(new SystemTimeProvider());
     }
 
@@ -58,12 +59,13 @@ public class StopwatchService extends Service {
 
         @Override
         public void reset() throws RemoteException {
-            // TODO implement
+            stopwatch.reset();
         }
 
         @Override
         public void lap() throws RemoteException {
-            // TODO implement
+            stopwatch.lap();
+            // TODO implement: needs to return a value
         }
     };
 }
