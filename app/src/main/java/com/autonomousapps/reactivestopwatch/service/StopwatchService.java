@@ -1,8 +1,8 @@
 package com.autonomousapps.reactivestopwatch.service;
 
+import com.autonomousapps.reactivestopwatch.di.DaggerUtil;
+import com.autonomousapps.reactivestopwatch.time.Lap;
 import com.autonomousapps.reactivestopwatch.time.Stopwatch;
-import com.autonomousapps.reactivestopwatch.time.StopwatchImpl;
-import com.autonomousapps.reactivestopwatch.time.SystemTimeProvider;
 
 import android.app.Service;
 import android.content.Intent;
@@ -11,18 +11,22 @@ import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 public class StopwatchService extends Service {
 
     private static final String TAG = StopwatchService.class.getSimpleName();
 
-    // TODO inject
-    private Stopwatch stopwatch;
+    @Inject
+    @Named("local")
+    Stopwatch stopwatch;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate()");
-        stopwatch = new StopwatchImpl(new SystemTimeProvider());
+        DaggerUtil.INSTANCE.getStopwatchComponent().inject(this);
     }
 
     @Nullable
@@ -33,18 +37,22 @@ public class StopwatchService extends Service {
 
     private final IStopwatchService.Stub binder = new IStopwatchService.Stub() {
 
+        private IStopwatchTickListener listener;
+
         @Override
         public void start(IStopwatchTickListener listener) throws RemoteException {
-            // TODO implement fully
-            stopwatch.start()
-                    .subscribe(tick -> {
-                        try {
-                            listener.onTick(tick);
-                        } catch (RemoteException e) {
-                            // TODO
-                            Log.e(TAG, "RemoteException calling listener::onTick: " + e.getLocalizedMessage());
-                        }
-                    });
+            this.listener = listener;
+
+            stopwatch.start().subscribe(this::onTick);
+        }
+
+        private void onTick(long tick) {
+            try {
+                listener.onTick(tick);
+            } catch (RemoteException e) {
+                // TODO
+                Log.e(TAG, "RemoteException calling listener::onTick: " + e.getLocalizedMessage());
+            }
         }
 
         @Override
@@ -64,7 +72,7 @@ public class StopwatchService extends Service {
 
         @Override
         public void lap() throws RemoteException {
-            stopwatch.lap();
+            Lap lap = stopwatch.lap();
             // TODO implement: needs to return a value
         }
     };

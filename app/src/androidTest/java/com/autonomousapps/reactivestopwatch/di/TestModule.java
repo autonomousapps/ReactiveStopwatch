@@ -1,8 +1,9 @@
 package com.autonomousapps.reactivestopwatch.di;
 
+import com.autonomousapps.reactivestopwatch.time.Stopwatch;
 import com.autonomousapps.reactivestopwatch.ui.StopwatchMvp;
 
-import javax.inject.Singleton;
+import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
@@ -12,15 +13,22 @@ import static org.mockito.Mockito.mock;
 @Module
 class TestModule {
 
-    private StopwatchMvp.Presenter stopwatchPresenter;
+    private final StopwatchMvp.Presenter mockStopwatchPresenter;
+    private final Stopwatch mockStopwatch;
 
     TestModule() {
-        stopwatchPresenter = mock(StopwatchMvp.Presenter.class);
+        mockStopwatchPresenter = mock(StopwatchMvp.Presenter.class);
+        mockStopwatch = mock(Stopwatch.class);
     }
 
-    @Singleton
     @Provides
     StopwatchMvp.Presenter providesStopwatchPresenter() {
-        return stopwatchPresenter;
+        return mockStopwatchPresenter;
+    }
+
+    @Provides
+    @Named("local")
+    Stopwatch providesLocalStopwatch() {
+        return mockStopwatch;
     }
 }

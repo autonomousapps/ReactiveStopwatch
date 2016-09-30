@@ -1,5 +1,6 @@
 package com.autonomousapps.reactivestopwatch.di;
 
+import com.autonomousapps.reactivestopwatch.service.StopwatchService;
 import com.autonomousapps.reactivestopwatch.ui.StopwatchFragment;
 import com.autonomousapps.reactivestopwatch.ui.StopwatchFragmentTest;
 
@@ -11,7 +12,11 @@ import dagger.Component;
 @Component(modules = TestModule.class)
 public interface TestStopwatchComponent extends StopwatchComponent {
 
+    void inject(StopwatchFragmentTest test);
+
+    // TODO remove once bug if fixed
     void inject(StopwatchFragment fragment);
 
-    void inject(StopwatchFragmentTest test);
+    // TODO remove once bug if fixed
+    void inject(StopwatchService service);
 }

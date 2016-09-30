@@ -9,6 +9,7 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import rx.Scheduler;
 import rx.Subscriber;
@@ -31,7 +32,7 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
     private Scheduler observingScheduler = AndroidSchedulers.mainThread();
 
     @Inject
-    StopwatchPresenter(@NonNull Stopwatch stopwatch) {
+    StopwatchPresenter(@NonNull @Named("remote") Stopwatch stopwatch) {
         this.stopwatch = stopwatch;
     }
 
