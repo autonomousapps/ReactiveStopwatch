@@ -1,10 +1,10 @@
 package com.autonomousapps.reactivestopwatch.service;
 
-import com.autonomousapps.reactivestopwatch.service.IStopwatchServiceListener;
+import com.autonomousapps.reactivestopwatch.service.IStopwatchTickListener;
 
 interface IStopwatchService {
 
-    oneway void start(in IStopwatchServiceListener listener);
+    oneway void start(in IStopwatchTickListener listener);
 
     oneway void togglePause();
 

@@ -1,6 +1,6 @@
 package com.autonomousapps.reactivestopwatch.service;
 
-interface IStopwatchServiceListener {
+interface IStopwatchTickListener {
 
     oneway void onTick(long millis);
 }

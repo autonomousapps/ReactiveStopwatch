@@ -1,7 +1,7 @@
 package com.autonomousapps.reactivestopwatch.time;
 
 import com.autonomousapps.reactivestopwatch.service.IStopwatchService;
-import com.autonomousapps.reactivestopwatch.service.IStopwatchServiceListener;
+import com.autonomousapps.reactivestopwatch.service.IStopwatchTickListener;
 import com.autonomousapps.reactivestopwatch.service.StopwatchService;
 
 import android.content.ComponentName;
@@ -67,7 +67,7 @@ public class RemoteStopwatch implements Stopwatch, AutoCloseable {
                     try {
                         // Start the remote stopwatch, which is contained by the remote Service
                         // Passing in the listener for `tick` events to communicate back across process boundaries. TODO rename listener
-                        remoteStopwatchService.start(new IStopwatchServiceListener.Stub() {
+                        remoteStopwatchService.start(new IStopwatchTickListener.Stub() {
 
                             @Override
                             public void onTick(long tick) throws RemoteException {

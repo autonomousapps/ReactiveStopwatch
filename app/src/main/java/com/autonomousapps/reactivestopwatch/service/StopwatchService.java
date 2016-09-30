@@ -33,7 +33,7 @@ public class StopwatchService extends Service {
     private final IStopwatchService.Stub binder = new IStopwatchService.Stub() {
 
         @Override
-        public void start(IStopwatchServiceListener listener) throws RemoteException {
+        public void start(IStopwatchTickListener listener) throws RemoteException {
             // TODO implement fully
             stopwatch.start()
                     .subscribe(tick -> {
