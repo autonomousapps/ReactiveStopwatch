@@ -19,7 +19,6 @@ public class StopwatchApplication extends Application {
     }
 
     private void initDagger() {
-        Log.d(TAG, "initDagger()");
         StopwatchComponent component = DaggerStopwatchComponent.builder()
                 .contextModule(new ContextModule(this))
                 .build();

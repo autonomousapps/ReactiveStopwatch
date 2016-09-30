@@ -67,26 +67,26 @@ public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
         TimeTeller timeTeller = mock(TimeTeller.class);
         view.setTimeTeller(timeTeller);
 
-        doOnUiThread(() -> view.onTick(1000L));
+        onMainThreadDo(() -> view.onTick(1000L));
 
         verify(timeTeller).tellTime(1000L);
     }
 
     @Test
     public void onStartedShouldChangeText() throws Throwable {
-        doOnUiThread(() -> view.onStopwatchStarted());
+        onMainThreadDo(() -> view.onStopwatchStarted());
 
         verifyViewIsDisplayedWithTextIgnoreCase(PAUSE_TEXT);
     }
 
     @Test
     public void onPausedShouldChangeText() throws Throwable {
-        doOnUiThread(() -> view.onStopwatchPaused());
+        onMainThreadDo(() -> view.onStopwatchPaused());
 
         verifyViewIsDisplayedWithTextIgnoreCase(START_TEXT);
     }
 
-    private void doOnUiThread(@NonNull Runnable action) throws Throwable {
+    private void onMainThreadDo(@NonNull Runnable action) throws Throwable {
         activityRule.runOnUiThread(action);
     }
 }

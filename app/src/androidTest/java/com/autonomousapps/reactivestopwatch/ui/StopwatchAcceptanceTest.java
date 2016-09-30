@@ -223,5 +223,4 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
         configurator.setWaitForIdleTimeout(timeout);
         teardownTasks.add(() -> configurator.setWaitForIdleTimeout(oldTimeout));
     }
-
 }
