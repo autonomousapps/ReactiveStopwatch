@@ -53,13 +53,17 @@ public class StopwatchImpl implements Stopwatch {
     }
 
     @Override
-    public boolean togglePause() {
+    public void togglePause() {
         isPaused = !isPaused;
         if (isPaused) {
             pausedTime = timeProvider.now();
         } else {
             startTime += timeProvider.now() - pausedTime;
         }
+    }
+
+    @Override
+    public boolean isPaused() {
         return isPaused;
     }
 

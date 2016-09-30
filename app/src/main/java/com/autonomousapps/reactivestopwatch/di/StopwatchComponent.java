@@ -7,7 +7,9 @@ import javax.inject.Singleton;
 import dagger.Component;
 
 @Singleton
-@Component(modules = PresenterModule.class)
+@Component(modules = {
+        PresenterModule.class
+})
 public interface StopwatchComponent {
 
     void inject(StopwatchFragment stopwatchFragment);

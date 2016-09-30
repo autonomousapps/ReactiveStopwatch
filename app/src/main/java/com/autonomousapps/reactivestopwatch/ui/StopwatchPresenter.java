@@ -90,10 +90,9 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
     private void togglePause() {
         Log.d(TAG, "togglePause()");
 
-        // TODO I'm not sure about this method returning a value. Either tracking in the presenter or having an isPaused() method in the stopwatch might be better
-        boolean isPaused = stopwatch.togglePause();
+        stopwatch.togglePause();
 
-        if (isPaused) {
+        if (stopwatch.isPaused()) {
             getView().onStopwatchPaused();
         } else {
             getView().onStopwatchStarted();

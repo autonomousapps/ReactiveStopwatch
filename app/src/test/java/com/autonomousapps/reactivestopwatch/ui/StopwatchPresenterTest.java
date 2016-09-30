@@ -61,7 +61,7 @@ public class StopwatchPresenterTest {
     public void startOrPausePausesOnSubsequentCalls() throws Exception {
         // Setup
         when(stopwatch.start()).thenReturn(testObservable);
-        when(stopwatch.togglePause()).thenReturn(true);
+        when(stopwatch.isPaused()).thenReturn(true);
 
         stopwatchPresenter.startOrPause();
         verify(view).onStopwatchStarted();
@@ -78,7 +78,7 @@ public class StopwatchPresenterTest {
     public void pausingTwiceUnpauses() throws Exception {
         // Setup
         when(stopwatch.start()).thenReturn(testObservable);
-        when(stopwatch.togglePause())
+        when(stopwatch.isPaused())
                 .thenReturn(true)
                 .thenReturn(false);
 

@@ -16,10 +16,13 @@ public interface Stopwatch {
 
     /**
      * Pauses or unpauses, depending on the current state of the stopwatch.
-     *
+     */
+    void togglePause();
+
+    /**
      * @return true if the stopwatch is paused; false otherwise.
      */
-    boolean togglePause();
+    boolean isPaused();
 
     /**
      * Resets the stopwatch.

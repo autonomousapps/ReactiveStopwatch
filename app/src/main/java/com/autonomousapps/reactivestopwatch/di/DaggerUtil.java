@@ -7,17 +7,19 @@ public enum DaggerUtil {
 
     private StopwatchComponent stopwatchComponent;
 
-    DaggerUtil() {
-        if (stopwatchComponent == null) {
-            stopwatchComponent = DaggerStopwatchComponent.create();
-        }
-    }
-
+    @NonNull
     public StopwatchComponent getStopwatchComponent() {
+        checkNotNull();
         return stopwatchComponent;
     }
 
-    public void setTestComponent(@NonNull StopwatchComponent testComponent) {
-        stopwatchComponent = testComponent;
+    private void checkNotNull() {
+        if (stopwatchComponent == null) {
+            throw new IllegalStateException("StopwatchComponent is null. setComponent() must be called first!");
+        }
+    }
+
+    public void setComponent(@NonNull StopwatchComponent component) {
+        stopwatchComponent = component;
     }
 }

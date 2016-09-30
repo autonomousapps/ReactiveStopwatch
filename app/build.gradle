@@ -106,3 +106,14 @@ dependencies {
     }
     releaseCompile "com.metova:cappuccino-no-op:${cappuccino_version}"
 }
+
+task sanityCheck {
+    group = "verification"
+
+    dependsOn 'assembleDebugAndroidTest', 'compileDebugUnitTestJavaWithJavac'
+    doLast {
+        println "\n#####################################################" +
+                "\n# Sanity check success! You may now push to origin. #\n" +
+                "#####################################################"
+    }
+}

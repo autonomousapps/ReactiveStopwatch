@@ -20,6 +20,6 @@ public abstract class AbstractMockedDependenciesTest extends AbstractAnimationDi
 
     private void initInjections() {
         testComponent = DaggerTestStopwatchComponent.create();
-        DaggerUtil.INSTANCE.setTestComponent(testComponent);
+        DaggerUtil.INSTANCE.setComponent(testComponent);
     }
 }
