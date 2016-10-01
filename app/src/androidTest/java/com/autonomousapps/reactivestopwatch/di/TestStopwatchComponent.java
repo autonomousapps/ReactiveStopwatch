@@ -14,9 +14,9 @@ public interface TestStopwatchComponent extends StopwatchComponent {
 
     void inject(StopwatchFragmentTest test);
 
-    // TODO remove once bug if fixed
+    // TODO remove once bug is fixed
     void inject(StopwatchFragment fragment);
 
-    // TODO remove once bug if fixed
+    // TODO remove once bug is fixed
     void inject(StopwatchService service);
 }

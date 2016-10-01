@@ -33,7 +33,7 @@ android {
     }
 }
 
-// Note the use of `annotationProcessor`. This is a drop-in replacement for the android-apt plugin, and its siblings.
+// Note the use of `annotationProcessor`. This is a drop-in replacement for the android-apt plugin and its siblings.
 // See here: http://tools.android.com/tech-docs/jackandjill
 dependencies {
     def androidsupport_version = '24.2.1'
@@ -48,8 +48,11 @@ dependencies {
     def dexmaker_version = '1.4'
     def hamcrest_version = '1.3'
     def espresso_core_version = '2.2.2'
+    def espresso_contrib_version = '2.0'
     def espresso_runner_version = '0.5'
     def cappuccino_version = '0.9'
+    def uiautomator_version = '2.1.2'
+    def awaitility_version = '2.0.0'
 
     compile "com.android.support:appcompat-v7:${androidsupport_version}"
 
@@ -85,22 +88,23 @@ dependencies {
     androidTestCompile "com.android.support.test.espresso:espresso-core:${espresso_core_version}"
     androidTestCompile "com.android.support.test.espresso:espresso-web:${espresso_core_version}"
     androidTestCompile "com.android.support.test.espresso:espresso-intents:${espresso_core_version}"
-    androidTestCompile("com.android.support.test.espresso:espresso-contrib:2.0") {
+    androidTestCompile("com.android.support.test.espresso:espresso-contrib:${espresso_contrib_version}") {
         exclude module: "appcompat"
         exclude module: "support-v4"
         exclude module: "recyclerview-v7"
     }
-    androidTestCompile "com.android.support.test.uiautomator:uiautomator-v18:2.1.2"
+    androidTestCompile "com.android.support.test.uiautomator:uiautomator-v18:${uiautomator_version}"
     androidTestCompile "org.hamcrest:hamcrest-library:${hamcrest_version}"
     androidTestCompile "junit:junit:${junit_version}"
     androidTestCompile "org.mockito:mockito-core:${mockito_version}"
     androidTestCompile "com.crittercism.dexmaker:dexmaker:${dexmaker_version}"
     androidTestCompile "com.crittercism.dexmaker:dexmaker-mockito:${dexmaker_version}"
     androidTestCompile "com.crittercism.dexmaker:dexmaker-dx:${dexmaker_version}"
-    androidTestCompile("org.awaitility:awaitility:2.0.0") {
+    androidTestCompile("org.awaitility:awaitility:${awaitility_version}") {
         transitive = false
     } // for testing asynchronous code
 
+    // System animations and IdlingResources
     debugCompile("com.metova:cappuccino:${cappuccino_version}") {
         transitive = false
     }
@@ -113,7 +117,7 @@ task sanityCheck {
     dependsOn 'assembleDebugAndroidTest', 'compileDebugUnitTestJavaWithJavac'
     doLast {
         println "\n#####################################################" +
-                "\n# Sanity check success! You may now push to origin. #\n" +
-                "#####################################################"
+                "\n# Sanity check success! You may now push to origin. #" +
+                "\n#####################################################"
     }
 }
