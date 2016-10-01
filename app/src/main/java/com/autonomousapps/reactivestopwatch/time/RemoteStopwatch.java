@@ -28,17 +28,21 @@ public class RemoteStopwatch implements Stopwatch, AutoCloseable {
     private final Context context;
 
     private IStopwatchService remoteService;
-    private BehaviorSubject<IStopwatchService> stopwatchSubject = BehaviorSubject.create();
+    private BehaviorSubject<IStopwatchService> stopwatchSubject;// = BehaviorSubject.create();
 
     private CompositeSubscription subscriptions;
 
     @Inject
     RemoteStopwatch(@NonNull Context context) {
         this.context = context;
-
         subscriptions = new CompositeSubscription();
+        startAndBindService();
+    }
 
+    // I want the service to continue running even when unbound, so I start it first
+    private void startAndBindService() {
         Intent serviceIntent = new Intent(context, StopwatchService.class);
+        context.startService(serviceIntent);
         context.bindService(serviceIntent, remoteServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -46,6 +50,8 @@ public class RemoteStopwatch implements Stopwatch, AutoCloseable {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             remoteService = IStopwatchService.Stub.asInterface(service);
+
+            stopwatchSubject = BehaviorSubject.create(); // can this happen without the prior subject completing first?
             stopwatchSubject.onNext(remoteService);
         }
 

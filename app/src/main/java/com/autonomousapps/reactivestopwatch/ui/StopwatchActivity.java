@@ -2,11 +2,9 @@ package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.R;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.widget.Toast;
 
-public class StopwatchActivity extends Activity {
+public class StopwatchActivity extends LifecycleLoggingActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -14,7 +14,7 @@ import android.util.Log;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class StopwatchService extends Service {
+public class StopwatchService extends LifecycleLoggingService {
 
     private static final String TAG = StopwatchService.class.getSimpleName();
 
