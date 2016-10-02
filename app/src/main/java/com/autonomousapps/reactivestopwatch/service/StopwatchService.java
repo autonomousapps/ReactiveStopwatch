@@ -112,9 +112,8 @@ public class StopwatchService extends LifecycleLoggingService {
         }
 
         @Override
-        public void lap() throws RemoteException {
-            Lap lap = stopwatch.lap();
-            // TODO implement: needs to return a value
+        public Lap lap() throws RemoteException {
+            return stopwatch.lap();
         }
 
         @Override

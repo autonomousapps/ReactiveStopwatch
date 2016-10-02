@@ -1,6 +1,7 @@
 package com.autonomousapps.reactivestopwatch.service;
 
 import com.autonomousapps.reactivestopwatch.service.IStopwatchTickListener;
+import com.autonomousapps.reactivestopwatch.time.Lap;
 
 interface IStopwatchService {
 
@@ -12,7 +13,7 @@ interface IStopwatchService {
 
     oneway void reset();
 
-    oneway void lap();
+    Lap lap();
 
     oneway void close();
 }

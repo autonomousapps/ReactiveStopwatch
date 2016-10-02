@@ -71,6 +71,7 @@ dependencies {
     // AutoValue
     provided "com.google.auto.value:auto-value:${autovalue_version}"
     annotationProcessor "com.google.auto.value:auto-value:${autovalue_version}"
+    annotationProcessor "com.ryanharter.auto.value:auto-value-parcel:0.2.4-rc2"
 
     /*
      * Unit tests

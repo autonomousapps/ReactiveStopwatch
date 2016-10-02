@@ -49,15 +49,12 @@ public class RemoteStopwatch implements Stopwatch {
 
     @Override
     public void onUiShown() {
-        // TODO implement (bind to service)
         Intent serviceIntent = new Intent(context, StopwatchService.class);
-        boolean success = context.bindService(serviceIntent, remoteServiceConnection, Context.BIND_AUTO_CREATE);
-        LogUtil.d(TAG, "bindService success=%s", success);
+        context.bindService(serviceIntent, remoteServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onUiHidden() {
-        // TODO implement (unbind from service)
         context.unbindService(remoteServiceConnection);
     }
 
@@ -140,6 +137,12 @@ public class RemoteStopwatch implements Stopwatch {
     @NonNull
     @Override
     public Lap lap() {
+        try {
+            remoteService.lap();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
         // TODO implement
         return null;
     }
