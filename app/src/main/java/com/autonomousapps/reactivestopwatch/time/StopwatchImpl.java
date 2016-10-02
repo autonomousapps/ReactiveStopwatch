@@ -14,7 +14,7 @@ import rx.Scheduler;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
-public class StopwatchImpl implements Stopwatch {
+public class StopwatchImpl extends AbstractStopwatch {
 
     static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
 
@@ -31,7 +31,7 @@ public class StopwatchImpl implements Stopwatch {
     private final TimeProvider timeProvider;
 
     @Inject
-    public StopwatchImpl(@NonNull TimeProvider timeProvider) {
+    StopwatchImpl(@NonNull TimeProvider timeProvider) {
         this.timeProvider = timeProvider;
     }
 
@@ -40,7 +40,7 @@ public class StopwatchImpl implements Stopwatch {
     public Observable<Long> start() {
         startTime = timeProvider.now();
 
-        // Using Observable.interval() to produce events as fast as possible. TODO Is there a better way?
+        // Using Observable.interval() to produce events as fast as possible
         return Observable.interval(1, TIME_UNIT, scheduler)
                 .onBackpressureDrop()
                 .takeUntil(stop)

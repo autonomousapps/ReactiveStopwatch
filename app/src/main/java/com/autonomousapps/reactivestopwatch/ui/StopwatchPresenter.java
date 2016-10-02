@@ -40,12 +40,14 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
     public void attachView(@NonNull StopwatchMvp.View view) {
         Log.d(TAG, "attachView()");
         this.view = view;
+        stopwatch.onUiShown(); // TODO test
     }
 
     @Override
     public void detachView() {
         Log.d(TAG, "detachView()");
         view = null;
+        stopwatch.onUiHidden(); // TODO test
     }
 
     @Override

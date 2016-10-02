@@ -1,18 +1,20 @@
 package com.autonomousapps.reactivestopwatch.service;
 
+import com.autonomousapps.common.LogUtil;
 import com.autonomousapps.reactivestopwatch.di.DaggerUtil;
 import com.autonomousapps.reactivestopwatch.time.Lap;
 import com.autonomousapps.reactivestopwatch.time.Stopwatch;
 
-import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 public class StopwatchService extends LifecycleLoggingService {
 
@@ -22,17 +24,51 @@ public class StopwatchService extends LifecycleLoggingService {
     @Named("local")
     Stopwatch stopwatch;
 
+    private final CompositeSubscription subscriptions = new CompositeSubscription();
+
+    boolean isRunning = false;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "onCreate()");
         DaggerUtil.INSTANCE.getStopwatchComponent().inject(this);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+
+        return START_NOT_STICKY; // TODO which?
+    }
+
+    @Override
+    public void onDestroy() {
+        subscriptions.clear();
+        super.onDestroy();
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
+    }
+
+    /**
+     * If {@link #stopwatch} is no longer running and all clients are unbound, stop service.
+     */
+    @Override
+    public boolean onUnbind(Intent intent) {
+        super.onUnbind(intent);
+        if (!isRunning) {
+            LogUtil.v(TAG + "lifecycle", "stopSelf()");
+            stopSelf();
+        }
+
+        return false; // False by default. True would call onRebind in future
+    }
+
+    void setIsRunning(boolean isRunning) {
+        this.isRunning = isRunning;
     }
 
     private final IStopwatchService.Stub binder = new IStopwatchService.Stub() {
@@ -43,21 +79,25 @@ public class StopwatchService extends LifecycleLoggingService {
         public void start(IStopwatchTickListener listener) throws RemoteException {
             this.listener = listener;
 
-            stopwatch.start().subscribe(this::onTick);
+            Subscription subscription = stopwatch.start().subscribe(this::onTick);
+            subscriptions.add(subscription);
+
+            setIsRunning(true);
         }
 
         private void onTick(long tick) {
             try {
                 listener.onTick(tick);
             } catch (RemoteException e) {
-                // TODO
-                Log.e(TAG, "RemoteException calling listener::onTick: " + e.getLocalizedMessage());
+                // TODO: more robust error handling
+                LogUtil.e(TAG, "RemoteException calling listener::onTick: " + e.getLocalizedMessage());
             }
         }
 
         @Override
         public void togglePause() throws RemoteException {
-            stopwatch.togglePause();
+            stopwatch.togglePause(); // TODO not idempotent. Should do nothing if not started/paused
+            setIsRunning(!isPaused());
         }
 
         @Override
@@ -68,12 +108,18 @@ public class StopwatchService extends LifecycleLoggingService {
         @Override
         public void reset() throws RemoteException {
             stopwatch.reset();
+            setIsRunning(false);
         }
 
         @Override
         public void lap() throws RemoteException {
             Lap lap = stopwatch.lap();
             // TODO implement: needs to return a value
+        }
+
+        @Override
+        public void close() {
+            stopwatch.close();
         }
     };
 }

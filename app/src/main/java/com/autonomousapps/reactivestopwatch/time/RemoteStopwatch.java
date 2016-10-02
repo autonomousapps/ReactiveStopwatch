@@ -1,5 +1,6 @@
 package com.autonomousapps.reactivestopwatch.time;
 
+import com.autonomousapps.common.LogUtil;
 import com.autonomousapps.reactivestopwatch.service.IStopwatchService;
 import com.autonomousapps.reactivestopwatch.service.IStopwatchTickListener;
 import com.autonomousapps.reactivestopwatch.service.StopwatchService;
@@ -21,14 +22,15 @@ import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
 // Inspiration from http://www.donnfelker.com/rxjava-with-aidl-services/
-public class RemoteStopwatch implements Stopwatch, AutoCloseable {
+// This also represents an implementation of the Adapter pattern.
+public class RemoteStopwatch implements Stopwatch {
 
     private static final String TAG = RemoteStopwatch.class.getSimpleName();
 
     private final Context context;
 
     private IStopwatchService remoteService;
-    private BehaviorSubject<IStopwatchService> stopwatchSubject;// = BehaviorSubject.create();
+    private BehaviorSubject<IStopwatchService> serviceConnectionSubject = BehaviorSubject.create();
 
     private CompositeSubscription subscriptions;
 
@@ -36,29 +38,44 @@ public class RemoteStopwatch implements Stopwatch, AutoCloseable {
     RemoteStopwatch(@NonNull Context context) {
         this.context = context;
         subscriptions = new CompositeSubscription();
-        startAndBindService();
+        startService();
     }
 
     // I want the service to continue running even when unbound, so I start it first
-    private void startAndBindService() {
+    private void startService() {
         Intent serviceIntent = new Intent(context, StopwatchService.class);
         context.startService(serviceIntent);
-        context.bindService(serviceIntent, remoteServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onUiShown() {
+        // TODO implement (bind to service)
+        Intent serviceIntent = new Intent(context, StopwatchService.class);
+        boolean success = context.bindService(serviceIntent, remoteServiceConnection, Context.BIND_AUTO_CREATE);
+        LogUtil.d(TAG, "bindService success=%s", success);
+    }
+
+    @Override
+    public void onUiHidden() {
+        // TODO implement (unbind from service)
+        context.unbindService(remoteServiceConnection);
     }
 
     private final ServiceConnection remoteServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            LogUtil.d(TAG, "onServiceConnected()");
             remoteService = IStopwatchService.Stub.asInterface(service);
 
-            stopwatchSubject = BehaviorSubject.create(); // can this happen without the prior subject completing first?
-            stopwatchSubject.onNext(remoteService);
+//            serviceConnectionSubject = BehaviorSubject.create(); // TODO can this happen without the prior subject completing first?
+            serviceConnectionSubject.onNext(remoteService);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            LogUtil.d(TAG, "onServiceDisconnected()");
             remoteService = null;
-            stopwatchSubject.onCompleted(); // TODO do I actually want to complete? What about re-connections?
+            serviceConnectionSubject.onCompleted(); // TODO do I actually want to complete? What about re-connections?
         }
     };
 
@@ -67,11 +84,11 @@ public class RemoteStopwatch implements Stopwatch, AutoCloseable {
     public Observable<Long> start() {
         final PublishSubject<Long> tickPublisher = PublishSubject.create();
 
-        Subscription subscription = stopwatchSubject.subscribe(
+        Subscription subscription = serviceConnectionSubject.subscribe(
                 // The action to take `onNext`, i.e., when `onServiceConnected` is called.
                 remoteStopwatchService -> {
                     try {
-                        // Start the remote stopwatch, which is contained by the remote Service
+                        // Start the remote stopwatch, which is owned by the remote Service
                         // Passing in the listener for `tick` events to communicate back across process boundaries.
                         remoteStopwatchService.start(new IStopwatchTickListener.Stub() {
 
@@ -83,8 +100,7 @@ public class RemoteStopwatch implements Stopwatch, AutoCloseable {
                     } catch (RemoteException e) {
                         tickPublisher.onError(e);
                     }
-                }, tickPublisher::onError); // TODO what's the point of this onError handling?
-        // TODO `onCompleted` action?
+                }, tickPublisher::onError/*, tickPublisher::onCompleted*/);
 
         subscriptions.add(subscription);
         return tickPublisher.asObservable();
@@ -130,7 +146,13 @@ public class RemoteStopwatch implements Stopwatch, AutoCloseable {
 
     @Override
     public void close() { // AutoCloseable
-        // TODO double-check: where's the best place to unsubscribe?
+        try {
+            // TODO null-check
+            remoteService.close();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
         context.unbindService(remoteServiceConnection);
         if (subscriptions != null) {
             subscriptions.clear();

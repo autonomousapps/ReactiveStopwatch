@@ -10,6 +10,14 @@ public class LogUtil {
         Log.v(tag, String.format(msg, args));
     }
 
+    public static void d(@NonNull String tag, @NonNull String msg, @Nullable Object... args) {
+        Log.d(tag, String.format(msg, args));
+    }
+
+    public static void e(@NonNull String tag, @NonNull String msg, @Nullable Object... args) {
+        Log.e(tag, String.format(msg, args));
+    }
+
     @NonNull
     public static String asString(@Nullable Object obj) {
         return obj != null ? obj.toString() : "null";

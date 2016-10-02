@@ -13,4 +13,6 @@ interface IStopwatchService {
     oneway void reset();
 
     oneway void lap();
+
+    oneway void close();
 }

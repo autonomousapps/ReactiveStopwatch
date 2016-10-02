@@ -4,7 +4,20 @@ import android.support.annotation.NonNull;
 
 import rx.Observable;
 
-public interface Stopwatch {
+/**
+ * Extending {@link AutoCloseable} because some implementations are resource-intensive.
+ */
+public interface Stopwatch extends AutoCloseable {
+
+    /**
+     * TODO
+     */
+    void onUiShown();
+
+    /**
+     * TODO
+     */
+    void onUiHidden();
 
     /**
      * Starts the stopwatch.
@@ -36,4 +49,7 @@ public interface Stopwatch {
      */
     @NonNull
     Lap lap();
+
+    @Override
+    void close(); // AutoCloseable
 }

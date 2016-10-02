@@ -1,6 +1,5 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
-import com.autonomousapps.reactivestopwatch.R;
 import com.autonomousapps.reactivestopwatch.test.AbstractAnimationDisablingTest;
 import com.autonomousapps.reactivestopwatch.test.Timer;
 
@@ -26,7 +25,6 @@ import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import static com.autonomousapps.reactivestopwatch.test.CommonEspressoCalls.verifyViewIsDisplayedWithId;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.is;
@@ -59,15 +57,34 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
     private UiDevice device;
 
+    private UiObject2 startPauseBtn;
+    private UiObject2 resetBtn;
+    private UiObject2 stopwatch;
+
     @Before
     public void setup() throws Exception {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         launchApp();
 
-        checkPreconditions();
-
         // UI thread is *never* idle because of the nature of the app, so set idle timeout to 0
         setIdleTimeout(IDLE_TIMEOUT_0);
+
+        checkPreconditions();
+    }
+
+    private void checkPreconditions() throws Exception {
+        assertThat(device, notNullValue());
+        verifyUi();
+    }
+
+    private void verifyUi() throws Exception {
+        stopwatch = getStopwatchView();
+        startPauseBtn = getStartPauseButton();
+        resetBtn = getResetButton();
+
+        assertThat(stopwatch, notNullValue());
+        assertThat(startPauseBtn, notNullValue());
+        assertThat(resetBtn, notNullValue());
     }
 
     @After
@@ -102,7 +119,7 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
      * is "com.android.launcher" but can be different at times. This is a generic solution which
      * works on all platforms.
      */
-    private String getLauncherPackageName() {
+    private static String getLauncherPackageName() {
         // Create launcher Intent
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_HOME);
@@ -115,10 +132,6 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
     @Test
     public void stopwatchShouldBeAccurate() throws Exception {
-        // Get start/pause button & stopwatch view
-        UiObject2 startPauseBtn = getStartPauseButton();
-        UiObject2 stopwatch = getStopwatchView();
-
         // Check precondition
         assertThat(stopwatch.getText(), is("00:00:00.0"));
 
@@ -144,9 +157,6 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
     @Test
     public void startPauseButtonShouldChangeText() throws Exception {
-        // Get start/pause button
-        UiObject2 startPauseBtn = getStartPauseButton();
-
         // Exercise: press 'start'
         startPauseBtn.click();
         assertThat(startPauseBtn.getText(), equalToIgnoringCase(PAUSE_TEXT));
@@ -160,11 +170,6 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
     @Test
     public void resetButtonShouldResetClock() throws Exception {
-        // Get start/pause and reset buttons
-        UiObject2 startPauseBtn = getStartPauseButton();
-        UiObject2 resetBtn = getResetButton();
-        UiObject2 stopwatch = getStopwatchView();
-
         // Press 'start'
         startPauseBtn.click();
 
@@ -180,18 +185,6 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
         // Verify
         assertThat(stopwatch.getText(), is("00:00:00.0"));
         assertThat(startPauseBtn.getText(), equalToIgnoringCase(START_TEXT));
-    }
-
-    private void checkPreconditions() throws Exception {
-        assertThat(device, notNullValue());
-        verifyUi();
-    }
-
-    private void verifyUi() throws Exception {
-        // TODO: use UiAutomator instead?
-        verifyViewIsDisplayedWithId(R.id.stopwatch);
-        verifyViewIsDisplayedWithId(R.id.btn_start);
-        verifyViewIsDisplayedWithId(R.id.btn_reset);
     }
 
     private UiObject2 getStartPauseButton() {
@@ -219,8 +212,12 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
     }
 
     private void setIdleTimeout(long timeout) {
-        long oldTimeout = configurator.getWaitForIdleTimeout();
+        long oldIdleTimeout = configurator.getWaitForIdleTimeout();
         configurator.setWaitForIdleTimeout(timeout);
-        teardownTasks.add(() -> configurator.setWaitForIdleTimeout(oldTimeout));
+        teardownTasks.add(() -> configurator.setWaitForIdleTimeout(oldIdleTimeout));
+
+        long oldSelectorTimeout = configurator.getWaitForSelectorTimeout();
+        configurator.setWaitForSelectorTimeout(timeout);
+        teardownTasks.add(() -> configurator.setWaitForSelectorTimeout(oldSelectorTimeout));
     }
 }
