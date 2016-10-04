@@ -20,14 +20,14 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btn_reset"
+            android:id="@+id/btn_reset_lap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/reset" />
 
         <Button
-            android:id="@+id/btn_start"
+            android:id="@+id/btn_start_stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

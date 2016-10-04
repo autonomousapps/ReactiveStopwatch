@@ -1,6 +1,7 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.mvp.ViewNotAttachedException;
+import com.autonomousapps.reactivestopwatch.time.Lap;
 import com.autonomousapps.reactivestopwatch.time.Stopwatch;
 
 import android.support.annotation.NonNull;
@@ -51,8 +52,8 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
     }
 
     @Override
-    public void startOrPause() {
-        Log.d(TAG, "startOrPause()");
+    public void startOrStop() {
+        Log.d(TAG, "startOrStop()");
 
         if (stopwatchSubscription == null) {
             start();
@@ -96,22 +97,39 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
         stopwatch.togglePause();
 
         if (stopwatch.isPaused()) {
-            getView().onStopwatchPaused();
+            getView().onStopwatchStopped();
         } else {
             getView().onStopwatchStarted();
         }
     }
 
     @Override
-    public void reset() {
-        Log.d(TAG, "reset()");
+    public void resetOrLap() {
+        Log.d(TAG, "resetOrLap()");
 
+        if (isRunning()) {
+            lap();
+        } else {
+            reset();
+        }
+    }
+
+    private boolean isRunning() {
+        return stopwatchSubscription != null && !stopwatch.isPaused();
+    }
+
+    private void reset() {
         stopwatch.reset();
         if (stopwatchSubscription != null) {
             stopwatchSubscription.unsubscribe();
             stopwatchSubscription = null;
         }
-        getView().onStopwatchPaused();
+        getView().onStopwatchReset();
+    }
+
+    private void lap() {
+        Lap lap = stopwatch.lap();
+        getView().onNewLap(lap);
     }
 
     @NonNull

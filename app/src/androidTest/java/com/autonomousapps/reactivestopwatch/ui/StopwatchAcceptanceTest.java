@@ -59,8 +59,8 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
     private UiDevice device;
 
-    private UiObject2 startPauseBtn;
-    private UiObject2 resetBtn;
+    private UiObject2 startStopBtn;
+    private UiObject2 resetLapBtn;
     private UiObject2 stopwatch;
 
     @Before
@@ -81,12 +81,12 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
     private void verifyUi() throws Exception {
         stopwatch = getStopwatchView();
-        startPauseBtn = getStartPauseButton();
-        resetBtn = getResetButton();
+        startStopBtn = getStartPauseButton();
+        resetLapBtn = getResetButton();
 
         assertThat(stopwatch, notNullValue());
-        assertThat(startPauseBtn, notNullValue());
-        assertThat(resetBtn, notNullValue());
+        assertThat(startStopBtn, notNullValue());
+        assertThat(resetLapBtn, notNullValue());
     }
 
     @After
@@ -139,8 +139,8 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
         // Press 'start'
         Timer timer = new Timer();
-        startPauseBtn.click();
-        assertThat(startPauseBtn.getText(), equalToIgnoringCase(STOP_TEXT));
+        startStopBtn.click();
+        assertThat(startStopBtn.getText(), equalToIgnoringCase(STOP_TEXT));
 
         // Exercise: wait for 1s
         await().pollInterval(10, TimeUnit.MILLISECONDS)
@@ -149,10 +149,10 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
         // Press pause
         long elapsedTime = timer.elapsedTime();
-        startPauseBtn.click();
+        startStopBtn.click();
 
         // Verify
-        assertThat(startPauseBtn.getText(), equalToIgnoringCase(START_TEXT));
+        assertThat(startStopBtn.getText(), equalToIgnoringCase(START_TEXT));
         assertThat(Math.abs(elapsedTime - 1000L), lessThanOrEqualTo(ERROR_MARGIN));
         assertThat(stopwatch.getText(), is("00:00:01.0"));
     }
@@ -160,20 +160,20 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
     @Test
     public void startPauseButtonShouldChangeText() throws Exception {
         // Exercise: press 'start'
-        startPauseBtn.click();
-        assertThat(startPauseBtn.getText(), equalToIgnoringCase(STOP_TEXT));
+        startStopBtn.click();
+        assertThat(startStopBtn.getText(), equalToIgnoringCase(STOP_TEXT));
 
         // Exercise: press pause
-        startPauseBtn.click();
+        startStopBtn.click();
 
         // Verify
-        assertThat(startPauseBtn.getText(), equalToIgnoringCase(START_TEXT));
+        assertThat(startStopBtn.getText(), equalToIgnoringCase(START_TEXT));
     }
 
     @Test
     public void resetButtonShouldResetClock() throws Exception {
         // Press 'start'
-        startPauseBtn.click();
+        startStopBtn.click();
 
         // Let a brief amount of time pass
         await().pollInterval(10, TimeUnit.MILLISECONDS)
@@ -181,12 +181,13 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
                 .until(() -> !stopwatch.getText().equals("00:00:00.0"));
         assertThat(stopwatch.getText(), not("00:00:00.0"));
 
-        // Exercise: press 'reset'
-        resetBtn.click();
+        // Exercise: press 'resetOrLap'
+        startStopBtn.click(); // so 'reset or lap' button is in 'reset' mode
+        resetLapBtn.click();
 
         // Verify
         assertThat(stopwatch.getText(), is("00:00:00.0"));
-        assertThat(startPauseBtn.getText(), equalToIgnoringCase(START_TEXT));
+        assertThat(startStopBtn.getText(), equalToIgnoringCase(START_TEXT));
     }
 
     private UiObject2 getStartPauseButton() {

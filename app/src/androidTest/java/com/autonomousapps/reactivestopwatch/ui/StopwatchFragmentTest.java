@@ -29,7 +29,7 @@ public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
     private static final String START_TEXT = "start";
     private static final String STOP_TEXT = "stop";
 
-    private static final String RESET_TEXT = "reset";
+    private static final String RESET_TEXT = "resetOrLap";
     private static final String LAP_TEXT = "lap";
 
     @Inject StopwatchMvp.Presenter stopwatchPresenter;
@@ -57,8 +57,8 @@ public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
 
     private void verifyUi() throws Exception {
         onView(withId(R.id.stopwatch)).check(matches(isDisplayed()));
-        onView(withId(R.id.btn_reset)).check(matches(isDisplayed()));
-        onView(withId(R.id.btn_start)).check(matches(isDisplayed()));
+        onView(withId(R.id.btn_reset_lap)).check(matches(isDisplayed()));
+        onView(withId(R.id.btn_start_stop)).check(matches(isDisplayed()));
     }
 
     private void launchApp() {
@@ -83,8 +83,8 @@ public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
     }
 
     @Test
-    public void onPausedShouldChangeText() throws Throwable {
-        onMainThreadDo(() -> view.onStopwatchPaused());
+    public void onStoppedShouldChangeText() throws Throwable {
+        onMainThreadDo(() -> view.onStopwatchStopped());
 
         verifyViewIsDisplayedWithTextIgnoreCase(START_TEXT);
     }

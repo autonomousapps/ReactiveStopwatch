@@ -1,5 +1,6 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
+import com.autonomousapps.reactivestopwatch.time.Lap;
 import com.autonomousapps.reactivestopwatch.view.TimeTeller;
 
 import android.support.annotation.NonNull;
@@ -13,7 +14,11 @@ public interface StopwatchMvp {
 
         void onStopwatchStarted();
 
-        void onStopwatchPaused();
+        void onStopwatchStopped();
+
+        void onStopwatchReset();
+
+        void onNewLap(@NonNull Lap lap);
 
         /*
          * Manual injection for testing
@@ -28,8 +33,8 @@ public interface StopwatchMvp {
 
         void detachView();
 
-        void startOrPause();
+        void startOrStop();
 
-        void reset();
+        void resetOrLap();
     }
 }

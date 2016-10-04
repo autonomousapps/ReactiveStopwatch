@@ -51,7 +51,7 @@ public class StopwatchPresenterTest {
         when(stopwatch.start()).thenReturn(testObservable);
 
         // Exercise
-        stopwatchPresenter.startOrPause();
+        stopwatchPresenter.startOrStop();
 
         // Verify
         verify(view).onStopwatchStarted();
@@ -63,15 +63,15 @@ public class StopwatchPresenterTest {
         when(stopwatch.start()).thenReturn(testObservable);
         when(stopwatch.isPaused()).thenReturn(true);
 
-        stopwatchPresenter.startOrPause();
+        stopwatchPresenter.startOrStop();
         verify(view).onStopwatchStarted();
 
         // Exercise
-        stopwatchPresenter.startOrPause();
+        stopwatchPresenter.startOrStop();
 
         // Verify
         verify(stopwatch).togglePause();
-        verify(view).onStopwatchPaused();
+        verify(view).onStopwatchStopped();
     }
 
     @Test
@@ -82,15 +82,15 @@ public class StopwatchPresenterTest {
                 .thenReturn(true)
                 .thenReturn(false);
 
-        stopwatchPresenter.startOrPause();
+        stopwatchPresenter.startOrStop();
         verify(view).onStopwatchStarted();
 
-        stopwatchPresenter.startOrPause();
+        stopwatchPresenter.startOrStop();
         verify(stopwatch).togglePause();
-        verify(view).onStopwatchPaused();
+        verify(view).onStopwatchStopped();
 
         // Exercise
-        stopwatchPresenter.startOrPause();
+        stopwatchPresenter.startOrStop();
 
         // Verify
         verify(view, times(2)).onStopwatchStarted();
@@ -102,7 +102,7 @@ public class StopwatchPresenterTest {
         when(stopwatch.start()).thenReturn(testObservable);
 
         // Exercise (#start() subscribes, which causes source Observable to emit its items)
-        stopwatchPresenter.startOrPause();
+        stopwatchPresenter.startOrStop();
         testScheduler.triggerActions();
 
         // Verify
@@ -119,7 +119,7 @@ public class StopwatchPresenterTest {
 
         // Exercise (#start() subscribes, which causes source Observable to emit its items if the TestScheduler is cool with that)
         stopwatchPresenter.detachView();
-        stopwatchPresenter.startOrPause();
+        stopwatchPresenter.startOrStop();
         testScheduler.triggerActions();
 
         // Verify
@@ -131,16 +131,20 @@ public class StopwatchPresenterTest {
     public void resetResetsAndStopsNewEvents() throws Exception {
         // Setup
         when(stopwatch.start()).thenReturn(testObservable);
-        stopwatchPresenter.startOrPause();
+        stopwatchPresenter.startOrStop();
         verify(view).onStopwatchStarted();
 
+        when(stopwatch.isPaused()).thenReturn(true);
+        stopwatchPresenter.startOrStop();
+        verify(view).onStopwatchStopped();
+
         // Exercise
-        stopwatchPresenter.reset();
+        stopwatchPresenter.resetOrLap();
         testScheduler.triggerActions();
 
         // Verify
         verify(stopwatch).reset();
-        verify(view).onStopwatchPaused();
+        verify(view).onStopwatchStopped();
         verify(view, never()).onTick(anyLong());
     }
 
@@ -151,7 +155,7 @@ public class StopwatchPresenterTest {
 
         // Exercise
         try {
-            stopwatchPresenter.reset();
+            stopwatchPresenter.resetOrLap();
             fail();
         } catch (ViewNotAttachedException e) {
             // Success!
