@@ -9,13 +9,14 @@ import android.os.Parcelable;
 public /*abstract */class Lap implements Parcelable {
 
 //    public static Lap create(long duration, long endTime) {
-//
 //        return new AutoValue_Lap(duration, endTime);
 //    }
 //
 //    abstract long duration();
 //
 //    abstract long endTime();
+
+//    public static final Creator CREATOR = AutoValue_Lap.CREATOR;
 
     public static Lap create(long duration, long endTime) {
         return new Lap(duration, endTime);
