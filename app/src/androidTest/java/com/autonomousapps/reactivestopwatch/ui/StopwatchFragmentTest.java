@@ -27,7 +27,10 @@ import static org.mockito.Mockito.verify;
 public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
 
     private static final String START_TEXT = "start";
-    private static final String PAUSE_TEXT = "pause";
+    private static final String STOP_TEXT = "stop";
+
+    private static final String RESET_TEXT = "reset";
+    private static final String LAP_TEXT = "lap";
 
     @Inject StopwatchMvp.Presenter stopwatchPresenter;
 
@@ -76,7 +79,7 @@ public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
     public void onStartedShouldChangeText() throws Throwable {
         onMainThreadDo(() -> view.onStopwatchStarted());
 
-        verifyViewIsDisplayedWithTextIgnoreCase(PAUSE_TEXT);
+        verifyViewIsDisplayedWithTextIgnoreCase(STOP_TEXT);
     }
 
     @Test

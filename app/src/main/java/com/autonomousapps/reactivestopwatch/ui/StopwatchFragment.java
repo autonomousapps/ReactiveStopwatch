@@ -90,7 +90,7 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
 
     @Override
     public void onStopwatchStarted() {
-        setStartPauseButtonText(getString(R.string.pause));
+        setStartPauseButtonText(getString(R.string.stop));
     }
 
     @Override

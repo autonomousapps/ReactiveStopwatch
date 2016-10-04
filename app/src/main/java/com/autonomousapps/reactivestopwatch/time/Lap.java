@@ -22,6 +22,8 @@ public /*abstract */class Lap implements Parcelable {
         return new Lap(duration, endTime);
     }
 
+    public static final Lap BAD_LAP = create(-1L, -1L);
+
     private final long duration;
     private final long endTime;
 

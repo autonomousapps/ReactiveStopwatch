@@ -49,8 +49,10 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
     private static final long ERROR_MARGIN = 100L; // 1/10th of one second
 
     private static final String START_TEXT = "start";
-    private static final String PAUSE_TEXT = "pause";
+    private static final String STOP_TEXT = "stop";
+
     private static final String RESET_TEXT = "reset";
+    private static final String LAP_TEXT = "lap";
 
     private Configurator configurator = Configurator.getInstance();
     private Collection<Runnable> teardownTasks = new LinkedList<>();
@@ -138,7 +140,7 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
         // Press 'start'
         Timer timer = new Timer();
         startPauseBtn.click();
-        assertThat(startPauseBtn.getText(), equalToIgnoringCase(PAUSE_TEXT));
+        assertThat(startPauseBtn.getText(), equalToIgnoringCase(STOP_TEXT));
 
         // Exercise: wait for 1s
         await().pollInterval(10, TimeUnit.MILLISECONDS)
@@ -159,7 +161,7 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
     public void startPauseButtonShouldChangeText() throws Exception {
         // Exercise: press 'start'
         startPauseBtn.click();
-        assertThat(startPauseBtn.getText(), equalToIgnoringCase(PAUSE_TEXT));
+        assertThat(startPauseBtn.getText(), equalToIgnoringCase(STOP_TEXT));
 
         // Exercise: press pause
         startPauseBtn.click();

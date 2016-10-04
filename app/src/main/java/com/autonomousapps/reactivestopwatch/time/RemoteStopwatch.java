@@ -138,13 +138,13 @@ public class RemoteStopwatch implements Stopwatch {
     @Override
     public Lap lap() {
         try {
-            remoteService.lap();
+            // TODO null-check
+            return remoteService.lap();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
 
-        // TODO implement
-        return null;
+        return Lap.BAD_LAP;
     }
 
     @Override
