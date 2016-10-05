@@ -29,7 +29,7 @@ public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
     private static final String START_TEXT = "start";
     private static final String STOP_TEXT = "stop";
 
-    private static final String RESET_TEXT = "resetOrLap";
+    private static final String RESET_TEXT = "reset";
     private static final String LAP_TEXT = "lap";
 
     @Inject StopwatchMvp.Presenter stopwatchPresenter;
@@ -80,6 +80,7 @@ public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
         onMainThreadDo(() -> view.onStopwatchStarted());
 
         verifyViewIsDisplayedWithTextIgnoreCase(STOP_TEXT);
+        verifyViewIsDisplayedWithTextIgnoreCase(LAP_TEXT);
     }
 
     @Test
@@ -87,6 +88,7 @@ public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
         onMainThreadDo(() -> view.onStopwatchStopped());
 
         verifyViewIsDisplayedWithTextIgnoreCase(START_TEXT);
+        verifyViewIsDisplayedWithTextIgnoreCase(RESET_TEXT);
     }
 
     private void onMainThreadDo(@NonNull Runnable action) throws Throwable {

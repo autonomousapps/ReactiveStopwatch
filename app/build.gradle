@@ -39,6 +39,7 @@ dependencies {
     def androidsupport_version = '24.2.1'
     def dagger_version = '2.6.1'//'2.7'
     def autovalue_version = '1.2'
+    def autovalue_parcel_version = '0.2.4-rc2'
     def butterknife_version = '8.4.0'
     def rxjava_version = '1.1.9'
     def rxandroid_version = '1.2.1'
@@ -71,7 +72,7 @@ dependencies {
     // AutoValue
     provided "com.google.auto.value:auto-value:${autovalue_version}"
     annotationProcessor "com.google.auto.value:auto-value:${autovalue_version}"
-    annotationProcessor "com.ryanharter.auto.value:auto-value-parcel:0.2.4-rc2"
+    annotationProcessor "com.ryanharter.auto.value:auto-value-parcel:${autovalue_parcel_version}"
 
     /*
      * Unit tests

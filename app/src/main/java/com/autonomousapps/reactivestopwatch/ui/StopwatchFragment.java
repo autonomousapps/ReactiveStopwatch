@@ -93,13 +93,13 @@ public class StopwatchFragment extends Fragment implements StopwatchMvp.View {
     @Override
     public void onStopwatchStarted() {
         setStartStopButtonText(R.string.stop);
-        setResetLapButton(R.string.lap); // TODO test
+        setResetLapButton(R.string.lap);
     }
 
     @Override
     public void onStopwatchStopped() {
         setStartStopButtonText(R.string.start);
-        setResetLapButton(R.string.reset); // TODO test
+        setResetLapButton(R.string.reset);
     }
 
     @Override

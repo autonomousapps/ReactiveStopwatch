@@ -46,7 +46,8 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
     // All time units in millis
     private static final long LAUNCH_TIMEOUT = 5000L;
     private static final long IDLE_TIMEOUT_0 = 0L;
-    private static final long ERROR_MARGIN = 100L; // 1/10th of one second
+    private static final long ERROR_MARGIN_100 = 100L; // 1/10th of one second
+    private static final long ERROR_MARGIN_150 = 150L;
 
     private static final String START_TEXT = "start";
     private static final String STOP_TEXT = "stop";
@@ -138,14 +139,14 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
         assertThat(stopwatch.getText(), is("00:00:00.0"));
 
         // Press 'start'
-        Timer timer = new Timer();
         startStopBtn.click();
+        Timer timer = new Timer();
         assertThat(startStopBtn.getText(), equalToIgnoringCase(STOP_TEXT));
 
-        // Exercise: wait for 1s
+        // Exercise: wait for 2s
         await().pollInterval(10, TimeUnit.MILLISECONDS)
-                .atMost(1000L + ERROR_MARGIN, TimeUnit.MILLISECONDS)
-                .until(() -> stopwatch.getText().startsWith("00:00:01"));
+                .atMost(2000L + ERROR_MARGIN_100, TimeUnit.MILLISECONDS)
+                .until(() -> stopwatch.getText().startsWith("00:00:02"));
 
         // Press pause
         long elapsedTime = timer.elapsedTime();
@@ -153,21 +154,49 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
         // Verify
         assertThat(startStopBtn.getText(), equalToIgnoringCase(START_TEXT));
-        assertThat(Math.abs(elapsedTime - 1000L), lessThanOrEqualTo(ERROR_MARGIN));
-        assertThat(stopwatch.getText(), is("00:00:01.0"));
+        assertThat(Math.abs(elapsedTime - 2000L), lessThanOrEqualTo(ERROR_MARGIN_150));
+        assertThat(stopwatch.getText(), is("00:00:02.0"));
     }
 
     @Test
-    public void startPauseButtonShouldChangeText() throws Exception {
+    public void stoppingAndStartingShouldStopAndStartTimer() throws Exception {
+        // Press 'start'
+        startStopBtn.click();
+        Timer timer = new Timer();
+
+        // Wait for 0.5s
+        await().pollInterval(10, TimeUnit.MILLISECONDS)
+                .atMost(500L + ERROR_MARGIN_100, TimeUnit.MILLISECONDS)
+                .until(() -> timer.elapsedTime() >= 500L);
+
+        // Stop timer
+        startStopBtn.click();
+        String currentTime = stopwatch.getText();
+
+        // Wait for 0.5s
+        await().pollInterval(10, TimeUnit.MILLISECONDS)
+                .atMost(500L + ERROR_MARGIN_100, TimeUnit.MILLISECONDS)
+                .until(() -> timer.elapsedTime() >= 1000L);
+
+        // Verify stopwatch hasn't changed
+        assertThat(stopwatch.getText(), is(currentTime));
+
+        // TODO more?
+    }
+
+    @Test
+    public void startingAndStoppingShouldChangeTextOnBothButtons() throws Exception {
         // Exercise: press 'start'
         startStopBtn.click();
         assertThat(startStopBtn.getText(), equalToIgnoringCase(STOP_TEXT));
+        assertThat(resetLapBtn.getText(), equalToIgnoringCase(LAP_TEXT));
 
         // Exercise: press pause
         startStopBtn.click();
 
         // Verify
         assertThat(startStopBtn.getText(), equalToIgnoringCase(START_TEXT));
+        assertThat(resetLapBtn.getText(), equalToIgnoringCase(RESET_TEXT));
     }
 
     @Test
@@ -177,11 +206,11 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
         // Let a brief amount of time pass
         await().pollInterval(10, TimeUnit.MILLISECONDS)
-                .atMost(1000L + ERROR_MARGIN, TimeUnit.MILLISECONDS)
+                .atMost(1000L + ERROR_MARGIN_100, TimeUnit.MILLISECONDS)
                 .until(() -> !stopwatch.getText().equals("00:00:00.0"));
         assertThat(stopwatch.getText(), not("00:00:00.0"));
 
-        // Exercise: press 'resetOrLap'
+        // Exercise: press 'reset'
         startStopBtn.click(); // so 'reset or lap' button is in 'reset' mode
         resetLapBtn.click();
 

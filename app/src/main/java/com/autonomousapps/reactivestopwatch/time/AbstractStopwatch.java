@@ -3,7 +3,8 @@ package com.autonomousapps.reactivestopwatch.time;
 /**
  * This class exists to provide a no-op implementation of several methods.
  */
-abstract class AbstractStopwatch implements Stopwatch {
+@SuppressWarnings("WeakerAccess") // Mockito needs this to be public
+public abstract class AbstractStopwatch implements Stopwatch {
 
     @Override
     public void onUiShown() {

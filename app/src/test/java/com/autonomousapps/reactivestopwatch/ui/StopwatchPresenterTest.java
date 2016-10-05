@@ -1,6 +1,7 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.mvp.ViewNotAttachedException;
+import com.autonomousapps.reactivestopwatch.time.Lap;
 import com.autonomousapps.reactivestopwatch.time.StopwatchImpl;
 
 import org.junit.After;
@@ -15,6 +16,7 @@ import rx.schedulers.TestScheduler;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -43,6 +45,17 @@ public class StopwatchPresenterTest {
     @After
     public void teardown() throws Exception {
         stopwatchPresenter.detachView();
+    }
+
+    @Test
+    public void attachingCallsOnUiShown() throws Exception {
+        verify(stopwatch).onUiShown();
+    }
+
+    @Test
+    public void detachingCallsOnUiHidden() throws Exception {
+        stopwatchPresenter.detachView();
+        verify(stopwatch).onUiHidden();
     }
 
     @Test
@@ -146,6 +159,21 @@ public class StopwatchPresenterTest {
         verify(stopwatch).reset();
         verify(view).onStopwatchStopped();
         verify(view, never()).onTick(anyLong());
+    }
+
+    @Test
+    public void resetOrLapCallsOnNewLapWhenRunning() throws Exception {
+        // Setup
+        when(stopwatch.start()).thenReturn(testObservable);
+        Lap lap = mock(Lap.class);
+        when(stopwatch.lap()).thenReturn(lap);
+        stopwatchPresenter.startOrStop();
+
+        // Exercise
+        stopwatchPresenter.resetOrLap();
+
+        // Verify
+        verify(view).onNewLap(lap);
     }
 
     @Test
