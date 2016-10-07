@@ -33,8 +33,9 @@ public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
     private static final String LAP_TEXT = "lap";
 
     @Inject StopwatchMvp.Presenter stopwatchPresenter;
-
     private StopwatchMvp.View view = null;
+
+    private TimeTeller mockTimeTeller;
 
     @Rule public ActivityTestRule<StopwatchActivity> activityRule = new ActivityTestRule<>(StopwatchActivity.class, true, false);
 
@@ -63,16 +64,15 @@ public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
 
     private void launchApp() {
         activityRule.launchActivity(new Intent());
+        mockTimeTeller = mock(TimeTeller.class);
+        view.setTimeTeller(mockTimeTeller);
     }
 
     @Test
     public void onTickShouldUpdateTime() throws Throwable {
-        TimeTeller timeTeller = mock(TimeTeller.class);
-        view.setTimeTeller(timeTeller);
-
         onMainThreadDo(() -> view.onTick(1000L));
 
-        verify(timeTeller).tellTime(1000L);
+        verify(mockTimeTeller).tellTime(1000L);
     }
 
     @Test
@@ -89,6 +89,20 @@ public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
 
         verifyViewIsDisplayedWithTextIgnoreCase(START_TEXT);
         verifyViewIsDisplayedWithTextIgnoreCase(RESET_TEXT);
+    }
+
+    @Test
+    public void onResetShouldChangeTextAndResetTime() throws Throwable {
+        onMainThreadDo(() -> view.onStopwatchReset());
+
+        verify(mockTimeTeller).tellTime(0L);
+        verifyViewIsDisplayedWithTextIgnoreCase(START_TEXT);
+        verifyViewIsDisplayedWithTextIgnoreCase(RESET_TEXT);
+    }
+
+//    @Test
+    public void onNewLapDisplaysLap() throws Throwable {
+        // TODO implement
     }
 
     private void onMainThreadDo(@NonNull Runnable action) throws Throwable {
