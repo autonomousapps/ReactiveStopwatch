@@ -31,6 +31,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
 /*
@@ -67,6 +68,7 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
     @Before
     public void setup() throws Exception {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        pressHome();
         launchApp();
 
         // UI thread is *never* idle because of the nature of the app, so set idle timeout to 0
@@ -100,21 +102,40 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
     }
 
     private void launchApp() {
-        device.pressHome();
+        launchApp(launchIntentClearTask()); // Clear out any previous instances
+    }
 
+    private void relaunchApp() {
+        launchApp(launchIntentReuseTask()); // re-use old instance
+    }
+
+    private void launchApp(@NonNull Intent launchIntent) {
         // Wait for launcher
         String launcherPackage = getLauncherPackageName();
         assertThat(launcherPackage, notNullValue());
         device.wait(Until.hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT);
 
         // Launch app
-        Context context = InstrumentationRegistry.getContext();
-        Intent intent = context.getPackageManager().getLaunchIntentForPackage(APPLICATION_PACKAGE);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear out any previous instances
-        context.startActivity(intent);
+        InstrumentationRegistry.getContext().startActivity(launchIntent);
 
         // Wait for the app to appear
         device.wait(Until.hasObject(By.pkg(APPLICATION_PACKAGE).depth(0)), LAUNCH_TIMEOUT);
+    }
+
+    @NonNull
+    private Intent launchIntentClearTask() {
+        Context context = InstrumentationRegistry.getContext();
+        Intent intent = context.getPackageManager().getLaunchIntentForPackage(APPLICATION_PACKAGE);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        return intent;
+    }
+
+    @NonNull
+    private Intent launchIntentReuseTask() {
+        Context context = InstrumentationRegistry.getContext();
+        Intent intent = context.getPackageManager().getLaunchIntentForPackage(APPLICATION_PACKAGE);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+        return intent;
     }
 
     /*
@@ -135,33 +156,37 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
     @Test
     public void stopwatchShouldBeAccurate() throws Exception {
+        final long WAIT = 2000L;
+
         // Check precondition
-        assertThat(stopwatch.getText(), is("00:00:00.0"));
+        assertThat(stopwatchTime(), is("00:00:00.0"));
 
         // Press 'start'
-        startStopBtn.click();
+        clickStartStopButton();
         Timer timer = new Timer();
-        assertThat(startStopBtn.getText(), equalToIgnoringCase(STOP_TEXT));
+        assertThat(startStopButtonText(), equalToIgnoringCase(STOP_TEXT));
 
         // Exercise: wait for 2s
         await().pollInterval(10, TimeUnit.MILLISECONDS)
-                .atMost(2000L + ERROR_MARGIN_100, TimeUnit.MILLISECONDS)
-                .until(() -> stopwatch.getText().startsWith("00:00:02"));
+                .atMost(WAIT + ERROR_MARGIN_150, TimeUnit.MILLISECONDS)
+                .until(() -> stopwatchTime().startsWith("00:00:02"));
 
         // Press pause
         long elapsedTime = timer.elapsedTime();
-        startStopBtn.click();
+        clickStartStopButton();
 
         // Verify
-        assertThat(startStopBtn.getText(), equalToIgnoringCase(START_TEXT));
-        assertThat(Math.abs(elapsedTime - 2000L), lessThanOrEqualTo(ERROR_MARGIN_150));
-        assertThat(stopwatch.getText(), is("00:00:02.0"));
+        assertThat(startStopButtonText(), equalToIgnoringCase(START_TEXT));
+        assertThat(Math.abs(elapsedTime - WAIT), lessThanOrEqualTo(ERROR_MARGIN_150));
+        assertThat(stopwatchTime(), startsWith("00:00:02"));
+
+        clickResetLapButton();
     }
 
     @Test
     public void stoppingAndStartingShouldStopAndStartTimer() throws Exception {
         // Press 'start'
-        startStopBtn.click();
+        clickStartStopButton();
         Timer timer = new Timer();
 
         // Wait for 0.5s
@@ -170,8 +195,8 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
                 .until(() -> timer.elapsedTime() >= 500L);
 
         // Stop timer
-        startStopBtn.click();
-        String currentTime = stopwatch.getText();
+        clickStartStopButton();
+        String currentTime = stopwatchTime();
 
         // Wait for 0.5s
         await().pollInterval(10, TimeUnit.MILLISECONDS)
@@ -179,44 +204,97 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
                 .until(() -> timer.elapsedTime() >= 1000L);
 
         // Verify stopwatch hasn't changed
-        assertThat(stopwatch.getText(), is(currentTime));
+        assertThat(stopwatchTime(), is(currentTime));
 
-        // TODO more?
+        clickResetLapButton();
     }
 
     @Test
     public void startingAndStoppingShouldChangeTextOnBothButtons() throws Exception {
         // Exercise: press 'start'
-        startStopBtn.click();
-        assertThat(startStopBtn.getText(), equalToIgnoringCase(STOP_TEXT));
-        assertThat(resetLapBtn.getText(), equalToIgnoringCase(LAP_TEXT));
+        clickStartStopButton();
+        assertThat(startStopButtonText(), equalToIgnoringCase(STOP_TEXT));
+        assertThat(resetLapButtonText(), equalToIgnoringCase(LAP_TEXT));
 
         // Exercise: press pause
-        startStopBtn.click();
+        clickStartStopButton();
 
         // Verify
-        assertThat(startStopBtn.getText(), equalToIgnoringCase(START_TEXT));
-        assertThat(resetLapBtn.getText(), equalToIgnoringCase(RESET_TEXT));
+        assertThat(startStopButtonText(), equalToIgnoringCase(START_TEXT));
+        assertThat(resetLapButtonText(), equalToIgnoringCase(RESET_TEXT));
     }
 
     @Test
     public void resetButtonShouldResetClock() throws Exception {
         // Press 'start'
-        startStopBtn.click();
+        clickStartStopButton();
 
         // Let a brief amount of time pass
         await().pollInterval(10, TimeUnit.MILLISECONDS)
                 .atMost(1000L + ERROR_MARGIN_100, TimeUnit.MILLISECONDS)
-                .until(() -> !stopwatch.getText().equals("00:00:00.0"));
-        assertThat(stopwatch.getText(), not("00:00:00.0"));
+                .until(() -> !stopwatchTime().equals("00:00:00.0"));
+        assertThat(stopwatchTime(), not("00:00:00.0"));
 
         // Exercise: press 'reset'
-        startStopBtn.click(); // so 'reset or lap' button is in 'reset' mode
-        resetLapBtn.click();
+        clickStartStopButton(); // so 'reset or lap' button is in 'reset' mode
+        clickResetLapButton();
 
         // Verify
-        assertThat(stopwatch.getText(), is("00:00:00.0"));
-        assertThat(startStopBtn.getText(), equalToIgnoringCase(START_TEXT));
+        assertThat(stopwatchTime(), is("00:00:00.0"));
+        assertThat(startStopButtonText(), equalToIgnoringCase(START_TEXT));
+    }
+
+    @Test
+    public void appShouldReturnFromBackgroundInCorrectState() throws Exception {
+        // Start stopwatch
+        clickStartStopButton();
+
+        // Let a brief amount of time pass
+        await().pollInterval(10, TimeUnit.MILLISECONDS)
+                .atMost(1000L + ERROR_MARGIN_100, TimeUnit.MILLISECONDS)
+                .until(() -> !stopwatchTime().equals("00:00:00.0"));
+        assertThat(stopwatchTime(), not("00:00:00.0"));
+
+        // Send app to background & re-launch
+        pressHome();
+        relaunchApp();
+
+        // Verify stopwatch is still ticking along
+        String currentTime = stopwatchTime();
+        await().pollInterval(10, TimeUnit.MILLISECONDS)
+                .atMost(1000L + ERROR_MARGIN_100, TimeUnit.MILLISECONDS)
+                .until(() -> !stopwatchTime().equals(currentTime));
+
+        clickStartStopButton();
+        clickResetLapButton();
+//        Thread.sleep(1000);
+    }
+
+    private void pressHome() {
+        device.pressHome();
+    }
+
+    private void clickStartStopButton() {
+        startStopBtn.click();
+    }
+
+    private void clickResetLapButton() {
+        resetLapBtn.click();
+    }
+
+    @NonNull
+    private String stopwatchTime() {
+        return stopwatch.getText();
+    }
+
+    @NonNull
+    private String startStopButtonText() {
+        return startStopBtn.getText();
+    }
+
+    @NonNull
+    private String resetLapButtonText() {
+        return resetLapBtn.getText();
     }
 
     private UiObject2 getStartPauseButton() {

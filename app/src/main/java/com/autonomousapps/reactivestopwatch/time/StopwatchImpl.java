@@ -1,5 +1,7 @@
 package com.autonomousapps.reactivestopwatch.time;
 
+import com.autonomousapps.common.LogUtil;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
@@ -16,12 +18,15 @@ import rx.subjects.PublishSubject;
 
 public class StopwatchImpl extends AbstractStopwatch {
 
+    private static final String TAG = StopwatchImpl.class.getSimpleName();
+
     static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
 
     private Scheduler scheduler = Schedulers.computation();
 
     private final List<Lap> laps = new ArrayList<>();
 
+    private Observable<Long> timerObservable = null;
     private final PublishSubject<Void> stop = PublishSubject.create();
     private volatile boolean isPaused = false;
 
@@ -38,14 +43,23 @@ public class StopwatchImpl extends AbstractStopwatch {
     @NonNull
     @Override
     public Observable<Long> start() {
+        if (timerObservable != null) {
+            LogUtil.d(TAG, "start(). Returning original Observable");
+            return timerObservable;
+        }
+
+        LogUtil.d(TAG, "start(). Returning new Observable");
+
         startTime = timeProvider.now();
 
         // Using Observable.interval() to produce events as fast as possible
-        return Observable.interval(1, TIME_UNIT, scheduler)
+        timerObservable = Observable.interval(1, TIME_UNIT, scheduler)
                 .onBackpressureDrop()
                 .takeUntil(stop)
                 .filter(ignored -> isNotPaused())
                 .map(ignored -> timeProvider.now() - startTime);
+        
+        return timerObservable;
     }
 
     private boolean isNotPaused() {
@@ -54,6 +68,8 @@ public class StopwatchImpl extends AbstractStopwatch {
 
     @Override
     public void togglePause() {
+        LogUtil.d(TAG, "togglePause()");
+
         isPaused = !isPaused;
         if (isPaused) {
             pausedTime = timeProvider.now();
@@ -64,19 +80,26 @@ public class StopwatchImpl extends AbstractStopwatch {
 
     @Override
     public boolean isPaused() {
+        LogUtil.d(TAG, "isPaused()=%s", isPaused);
+
         return isPaused;
     }
 
     @Override
     public void reset() {
+        LogUtil.d(TAG, "reset()");
+
         isPaused = false;
         stop.onNext(null);
+        timerObservable = null;
     }
 
     // TODO do I need the list of laps?
     @NonNull
     @Override
     public Lap lap() {
+        LogUtil.d(TAG, "lap()");
+
         long lastEndTime = 0L;
         int lastIndex = laps.size() - 1;
         if (lastIndex >= 0) {

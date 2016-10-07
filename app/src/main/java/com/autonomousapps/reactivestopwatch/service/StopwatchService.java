@@ -64,7 +64,7 @@ public class StopwatchService extends LifecycleLoggingService {
             stopSelf();
         }
 
-        return false; // False by default. True would call onRebind in future
+        return false; // False by default. True calls onRebind in future
     }
 
     void setIsRunning(boolean isRunning) {

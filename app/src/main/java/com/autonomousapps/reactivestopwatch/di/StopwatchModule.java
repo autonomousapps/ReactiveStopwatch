@@ -10,6 +10,7 @@ import javax.inject.Named;
 
 import dagger.Binds;
 import dagger.Module;
+import dagger.Provides;
 
 @Module(includes = {
         ContextModule.class

@@ -81,6 +81,7 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
                     @Override
                     public void onError(Throwable e) {
                         Log.e(TAG, "onError: " + e.getLocalizedMessage());
+                        e.printStackTrace();
                     }
 
                     @Override

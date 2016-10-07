@@ -56,6 +56,8 @@ public class RemoteStopwatch implements Stopwatch {
     @Override
     public void onUiHidden() {
         context.unbindService(remoteServiceConnection);
+        subscriptions.clear();
+        remoteService = null;
     }
 
     private final ServiceConnection remoteServiceConnection = new ServiceConnection() {
@@ -95,12 +97,18 @@ public class RemoteStopwatch implements Stopwatch {
                             }
                         });
                     } catch (RemoteException e) {
+                        LogUtil.e(TAG, "RemoteException");
                         tickPublisher.onError(e);
                     }
-                }, tickPublisher::onError/*, tickPublisher::onCompleted*/);
+                }, this::onError/*tickPublisher::onError*//*, tickPublisher::onCompleted*/);
 
         subscriptions.add(subscription);
         return tickPublisher.asObservable();
+    }
+
+    private void onError(Throwable throwable) {
+        LogUtil.e(TAG, "onError(): %s", throwable.getLocalizedMessage());
+        throwable.printStackTrace();
     }
 
     @Override
