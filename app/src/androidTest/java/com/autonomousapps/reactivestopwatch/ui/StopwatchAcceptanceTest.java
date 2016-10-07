@@ -1,5 +1,6 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
+import com.autonomousapps.common.LogUtil;
 import com.autonomousapps.reactivestopwatch.test.AbstractAnimationDisablingTest;
 import com.autonomousapps.reactivestopwatch.test.Timer;
 
@@ -162,7 +163,7 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
         assertThat(stopwatchTime(), is("00:00:00.0"));
 
         // Press 'start'
-        clickStartStopButton();
+        startStopwatch();
         Timer timer = new Timer();
         assertThat(startStopButtonText(), equalToIgnoringCase(STOP_TEXT));
 
@@ -171,22 +172,23 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
                 .atMost(WAIT + ERROR_MARGIN_150, TimeUnit.MILLISECONDS)
                 .until(() -> stopwatchTime().startsWith("00:00:02"));
 
-        // Press pause
+        // Press stop
         long elapsedTime = timer.elapsedTime();
-        clickStartStopButton();
+        stopStopwatch();
 
         // Verify
         assertThat(startStopButtonText(), equalToIgnoringCase(START_TEXT));
         assertThat(Math.abs(elapsedTime - WAIT), lessThanOrEqualTo(ERROR_MARGIN_150));
         assertThat(stopwatchTime(), startsWith("00:00:02"));
 
-        clickResetLapButton();
+        // Cleanup TODO put in @After
+        resetStopwatch();
     }
 
     @Test
     public void stoppingAndStartingShouldStopAndStartTimer() throws Exception {
         // Press 'start'
-        clickStartStopButton();
+        startStopwatch();
         Timer timer = new Timer();
 
         // Wait for 0.5s
@@ -195,7 +197,7 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
                 .until(() -> timer.elapsedTime() >= 500L);
 
         // Stop timer
-        clickStartStopButton();
+        stopStopwatch();
         String currentTime = stopwatchTime();
 
         // Wait for 0.5s
@@ -206,18 +208,19 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
         // Verify stopwatch hasn't changed
         assertThat(stopwatchTime(), is(currentTime));
 
-        clickResetLapButton();
+        // Cleanup TODO put in @After
+        resetStopwatch();
     }
 
     @Test
     public void startingAndStoppingShouldChangeTextOnBothButtons() throws Exception {
         // Exercise: press 'start'
-        clickStartStopButton();
+        startStopwatch();
         assertThat(startStopButtonText(), equalToIgnoringCase(STOP_TEXT));
         assertThat(resetLapButtonText(), equalToIgnoringCase(LAP_TEXT));
 
         // Exercise: press pause
-        clickStartStopButton();
+        stopStopwatch();
 
         // Verify
         assertThat(startStopButtonText(), equalToIgnoringCase(START_TEXT));
@@ -227,7 +230,7 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
     @Test
     public void resetButtonShouldResetClock() throws Exception {
         // Press 'start'
-        clickStartStopButton();
+        startStopwatch();
 
         // Let a brief amount of time pass
         await().pollInterval(10, TimeUnit.MILLISECONDS)
@@ -236,8 +239,8 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
         assertThat(stopwatchTime(), not("00:00:00.0"));
 
         // Exercise: press 'reset'
-        clickStartStopButton(); // so 'reset or lap' button is in 'reset' mode
-        clickResetLapButton();
+        stopStopwatch(); // so 'reset or lap' button is in 'reset' mode
+        resetStopwatch();
 
         // Verify
         assertThat(stopwatchTime(), is("00:00:00.0"));
@@ -247,7 +250,7 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
     @Test
     public void appShouldReturnFromBackgroundInCorrectState() throws Exception {
         // Start stopwatch
-        clickStartStopButton();
+        startStopwatch();
 
         // Let a brief amount of time pass
         await().pollInterval(10, TimeUnit.MILLISECONDS)
@@ -265,20 +268,37 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
                 .atMost(1000L + ERROR_MARGIN_100, TimeUnit.MILLISECONDS)
                 .until(() -> !stopwatchTime().equals(currentTime));
 
-        clickStartStopButton();
-        clickResetLapButton();
-//        Thread.sleep(1000);
+        // Cleanup TODO put in @After method
+        stopStopwatch();
+        resetStopwatch();
+    }
+
+//    @Test
+    public void lapWorks() throws Exception {
+        // TODO implement
     }
 
     private void pressHome() {
         device.pressHome();
     }
 
-    private void clickStartStopButton() {
+    private void startStopwatch() {
+        assertThat(startStopButtonText(), equalToIgnoringCase(START_TEXT));
         startStopBtn.click();
     }
 
-    private void clickResetLapButton() {
+    private void stopStopwatch() {
+        assertThat(startStopButtonText(), equalToIgnoringCase(STOP_TEXT));
+        startStopBtn.click();
+    }
+
+    private void resetStopwatch() {
+        assertThat(resetLapButtonText(), equalToIgnoringCase(RESET_TEXT));
+        resetLapBtn.click();
+    }
+
+    private void lapStopwatch() {
+        assertThat(resetLapButtonText(), equalToIgnoringCase(LAP_TEXT));
         resetLapBtn.click();
     }
 
