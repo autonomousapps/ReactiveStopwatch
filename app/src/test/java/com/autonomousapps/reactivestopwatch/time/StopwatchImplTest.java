@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
-public class StopwatchTest {
+public class StopwatchImplTest {
 
     private final TestScheduler testScheduler = new TestScheduler();
 
