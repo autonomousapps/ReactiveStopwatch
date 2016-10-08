@@ -1,6 +1,5 @@
 package com.autonomousapps.reactivestopwatch.ui;
 
-import com.autonomousapps.common.LogUtil;
 import com.autonomousapps.reactivestopwatch.test.AbstractAnimationDisablingTest;
 import com.autonomousapps.reactivestopwatch.test.Timer;
 
@@ -95,7 +94,31 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
     @After
     public void teardown() throws Exception {
+        resetTestState();
         resetConfigurator();
+    }
+
+    private void resetTestState() {
+        if (!stopwatchTime().equals("00:00:00.0")) { // running or paused
+            if (isRunning()) {   // if running, pause so we can reset
+                stopStopwatch();
+            }
+            resetStopwatch();    // regardless, reset
+        }
+    }
+
+    private boolean isRunning() {
+        boolean isRunning = true;
+        try {
+            String currentTime = stopwatchTime();
+            await().pollInterval(10, TimeUnit.MILLISECONDS)
+                    .atMost(100L, TimeUnit.MILLISECONDS)
+                    .until(() -> !stopwatchTime().equals(currentTime));
+        } catch (Exception e) {
+            isRunning = false;
+        }
+
+        return isRunning;
     }
 
     private void resetConfigurator() {
@@ -180,9 +203,6 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
         assertThat(startStopButtonText(), equalToIgnoringCase(START_TEXT));
         assertThat(Math.abs(elapsedTime - WAIT), lessThanOrEqualTo(ERROR_MARGIN_150));
         assertThat(stopwatchTime(), startsWith("00:00:02"));
-
-        // Cleanup TODO put in @After
-        resetStopwatch();
     }
 
     @Test
@@ -207,9 +227,6 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
         // Verify stopwatch hasn't changed
         assertThat(stopwatchTime(), is(currentTime));
-
-        // Cleanup TODO put in @After
-        resetStopwatch();
     }
 
     @Test
@@ -267,13 +284,9 @@ public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
         await().pollInterval(10, TimeUnit.MILLISECONDS)
                 .atMost(1000L + ERROR_MARGIN_100, TimeUnit.MILLISECONDS)
                 .until(() -> !stopwatchTime().equals(currentTime));
-
-        // Cleanup TODO put in @After method
-        stopStopwatch();
-        resetStopwatch();
     }
 
-//    @Test
+    //    @Test
     public void lapWorks() throws Exception {
         // TODO implement
     }
