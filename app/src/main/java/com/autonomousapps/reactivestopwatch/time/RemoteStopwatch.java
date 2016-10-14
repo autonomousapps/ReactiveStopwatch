@@ -98,9 +98,9 @@ public class RemoteStopwatch implements Stopwatch {
                         });
                     } catch (RemoteException e) {
                         LogUtil.e(TAG, "RemoteException");
-                        tickPublisher.onError(e);
+                        onError(e);
                     }
-                }, this::onError/*tickPublisher::onError*//*, tickPublisher::onCompleted*/);
+                }, this::onError, this::onComplete);
 
         subscriptions.add(subscription);
         return tickPublisher.asObservable();
@@ -109,6 +109,10 @@ public class RemoteStopwatch implements Stopwatch {
     private void onError(Throwable throwable) {
         LogUtil.e(TAG, "onError(): %s", throwable.getLocalizedMessage());
         throwable.printStackTrace();
+    }
+
+    private void onComplete() {
+        // TODO implement reconnection logic
     }
 
     @Override
