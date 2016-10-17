@@ -60,7 +60,7 @@ public class StopwatchService extends LifecycleLoggingService {
     public boolean onUnbind(Intent intent) {
         super.onUnbind(intent);
         if (!isRunning) {
-            LogUtil.v(TAG + "lifecycle", "stopSelf()");
+            LogUtil.v(TAG + "_lifecycle", "stopSelf()");
             stopSelf();
         }
 
