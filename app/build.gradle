@@ -3,7 +3,7 @@ apply plugin: 'com.metova.cappuccino-animations'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    buildToolsVersion "24.0.1" // 24.0.3 has a bad bug. 24.0.1 is fine.
 
     defaultConfig {
         applicationId "com.autonomousapps.reactivestopwatch"
@@ -124,3 +124,5 @@ task sanityCheck {
                 "\n#####################################################"
     }
 }
+
+apply from: rootProject.file("gradle/tests.gradle")
