@@ -1,10 +1,33 @@
 // TODO unfortunately, connectedDebugAndroidTest picks up my ATs as well.
 
-task commitTests(dependsOn: ["testDebugUnitTest", "connectedDebugAndroidTest"]) {
+task commitTests(dependsOn: ["testDebugUnitTest", "uiUnitTests"]) {
     group "verification"
     description "Runs commit-stage tests"
 
+    // Next step in the pipeline
     finalizedBy 'acceptanceTests'
+}
+
+task uiUnitTests(dependsOn: ["connectedDebugAndroidTest"]) {
+    group "verification"
+    description "Runs Espresso unit tests"
+
+    // TODO this gets evaluated and so set no matter what. I only want it set for this task. I may just have to use a normal bash script
+    // TODO maybe Exec tasks? Can an exec task execute a gradle command?
+    project.android.defaultConfig.testInstrumentationRunnerArguments(
+            annotation: "com.autonomousapps.reactivestopwatch.test.CommitStage"
+    )
+}
+
+// TODO bad idea, has to start a new daemon
+task blah(type: Exec) {
+    commandLine "../gradlew uiUnitTests".split(' ')
+}
+
+
+// TODO remove
+afterEvaluate {
+    println "testInstrumentationRunnerArguments: " + project.android.defaultConfig.testInstrumentationRunnerArguments
 }
 
 afterEvaluate {
@@ -14,6 +37,9 @@ afterEvaluate {
 }
 
 task acceptanceTests() {
+    group "verification"
+    description "Runs acceptance tests"
+
     onlyIf {
         // Only run if commit tests _did not_ fail
         commitTests.state.failure == null

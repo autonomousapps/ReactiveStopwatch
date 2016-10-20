@@ -2,6 +2,7 @@ package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.R;
 import com.autonomousapps.reactivestopwatch.test.AbstractMockedDependenciesTest;
+import com.autonomousapps.reactivestopwatch.test.CommitStage;
 import com.autonomousapps.reactivestopwatch.view.TimeTeller;
 
 import org.junit.Before;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+@CommitStage
 public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
 
     private static final String START_TEXT = "start";
@@ -100,7 +102,7 @@ public class StopwatchFragmentTest extends AbstractMockedDependenciesTest {
         verifyViewIsDisplayedWithTextIgnoreCase(RESET_TEXT);
     }
 
-//    @Test
+    //    @Test
     public void onNewLapDisplaysLap() throws Throwable {
         // TODO implement
     }

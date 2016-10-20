@@ -17,6 +17,9 @@ android {
         }
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunnerArguments(
+//                annotation: "com.autonomousapps.reactivestopwatch.test.CommitStage"
+//        )
     }
 
     buildTypes {
