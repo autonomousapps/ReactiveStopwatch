@@ -1,0 +1,25 @@
+// TODO unfortunately, connectedDebugAndroidTest picks up my ATs as well.
+
+task commitTests(dependsOn: ["testDebugUnitTest", "connectedDebugAndroidTest"]) {
+    group "verification"
+    description "Runs commit-stage tests"
+
+    finalizedBy 'acceptanceTests'
+}
+
+afterEvaluate {
+    // These two tasks are dynamically generated, so they aren't available until after
+    // the configuration phase
+    project.tasks.findByName('connectedDebugAndroidTest').mustRunAfter 'testDebugUnitTest'
+}
+
+task acceptanceTests() {
+    onlyIf {
+        // Only run if commit tests _did not_ fail
+        commitTests.state.failure == null
+    }
+
+    doLast {
+        println "acceptanceTests"
+    }
+}
