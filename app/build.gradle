@@ -54,7 +54,7 @@ dependencies {
     def espresso_core_version = '2.2.2'
     def espresso_contrib_version = '2.0'
     def espresso_runner_version = '0.5'
-    def cappuccino_version = '0.9'
+    def cappuccino_version = '0.9.1'
     def uiautomator_version = '2.1.2'
     def awaitility_version = '2.0.0'
 
@@ -111,9 +111,7 @@ dependencies {
     } // for testing asynchronous code
 
     // System animations and IdlingResources
-    debugCompile("com.metova:cappuccino:${cappuccino_version}") {
-        transitive = false
-    }
+    debugCompile "com.metova:cappuccino:${cappuccino_version}"
     releaseCompile "com.metova:cappuccino-no-op:${cappuccino_version}"
 }
 
@@ -128,4 +126,5 @@ task sanityCheck {
     }
 }
 
+// TODO these are a WIP
 apply from: rootProject.file("gradle/tests.gradle")
