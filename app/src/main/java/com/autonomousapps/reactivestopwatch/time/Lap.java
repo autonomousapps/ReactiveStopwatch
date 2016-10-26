@@ -8,7 +8,7 @@ import android.os.Parcelable;
 @AutoValue
 public abstract class Lap implements Parcelable {
 
-    static final Lap BAD_LAP = create(-1L, -1L);
+    public static final Lap BAD_LAP = create(-1L, -1L);
 
     public static Lap create(long duration, long endTime) {
         return new AutoValue_Lap(duration, endTime);

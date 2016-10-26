@@ -13,7 +13,8 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module(includes = {
-        ContextModule.class
+//        ContextModule.class
+        ServiceModule.class
 })
 abstract class StopwatchModule {
 
