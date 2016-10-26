@@ -1,5 +1,6 @@
 package com.autonomousapps.reactivestopwatch.di;
 
+import com.autonomousapps.common.LogUtil;
 import com.autonomousapps.reactivestopwatch.time.Stopwatch;
 import com.autonomousapps.reactivestopwatch.ui.StopwatchMvp;
 
@@ -17,6 +18,8 @@ class TestModule {
     private final Stopwatch mockStopwatch;
 
     TestModule() {
+        LogUtil.e("TEST", "new TestModule()");
+
         mockStopwatchPresenter = mock(StopwatchMvp.Presenter.class);
         mockStopwatch = mock(Stopwatch.class);
     }
@@ -29,6 +32,13 @@ class TestModule {
     @Provides
     @Named("local")
     Stopwatch providesLocalStopwatch() {
+        LogUtil.e("TEST", "providing local stopwatch: " + mockStopwatch.toString());
+        return mockStopwatch;
+    }
+
+    @Provides
+    @Named("remote")
+    Stopwatch providesRemoteStopwatch() {
         return mockStopwatch;
     }
 }

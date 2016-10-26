@@ -22,14 +22,14 @@ public abstract class LifecycleLoggingService extends Service {
 
     @Override
     public void onCreate() {
-        super.onCreate();
         log("onCreate()");
+        super.onCreate();
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         log("onDestroy()");
+        super.onDestroy();
     }
 
     @Nullable
@@ -47,14 +47,14 @@ public abstract class LifecycleLoggingService extends Service {
 
     @Override
     public void onRebind(Intent intent) {
-        super.onRebind(intent);
         log("onRebind(%s)", asString(intent));
+        super.onRebind(intent);
     }
 
     @Override
     public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
         log("onTrimMemory(%d)", level);
+        super.onTrimMemory(level);
     }
 
     private static void log(@NonNull String msg, @Nullable Object... args) {

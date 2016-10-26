@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.1'
-        classpath "gradle.plugin.com.metova:cappuccino-plugin:0.8"
+        classpath "gradle.plugin.com.metova:cappuccino-plugin:0.7.3"//something is wrong with 0.8
 
         // Per https://code.google.com/p/android/issues/detail?id=214615 and https://code.google.com/p/android/issues/detail?id=213471
         classpath "com.google.guava:guava:19.0"
