@@ -127,4 +127,4 @@ task sanityCheck {
 }
 
 // TODO these are a WIP
-apply from: rootProject.file("gradle/tests.gradle")
+//apply from: rootProject.file("gradle/tests.gradle")
