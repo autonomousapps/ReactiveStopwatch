@@ -2,6 +2,7 @@ package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.test.AbstractAnimationDisablingTest;
 import com.autonomousapps.reactivestopwatch.test.Timer;
+import com.autonomousapps.reactivestopwatch.test.annotations.AcceptanceStage;
 
 import org.junit.After;
 import org.junit.Before;
@@ -40,6 +41,7 @@ import static org.junit.Assert.assertThat;
  * calls may block unexpectedly if the main thread is active.
  * (2)
  */
+@AcceptanceStage
 public class StopwatchAcceptanceTest extends AbstractAnimationDisablingTest {
 
     private static final String APPLICATION_PACKAGE = "com.autonomousapps.reactivestopwatch";

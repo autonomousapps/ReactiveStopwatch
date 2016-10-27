@@ -1,42 +1,100 @@
-// TODO unfortunately, connectedDebugAndroidTest picks up my ATs as well.
+// TODO this needs to be more configurable (for flavors, e.g.)
 
-task commitTests(dependsOn: ["testDebugUnitTest", "uiUnitTests"]) {
+/*
+ * Main tasks available here:
+ * (1) startPipeline   -- runs all tests, in order. Will not run ATs if commit tests fail.
+ * (2) commitTests     -- runs jvm and ui unit tests. Will automatically run ATs if this suite fails, unless you use the
+ *                        command-line argument -Ppipeline=false (`./gradlew commitTests -Ppipeline=false`)
+ * (3) acceptanceTests -- runs acceptance tests.
+ */
+
+/**
+ * Starts the build pipeline. Depends only on cleaning-related tasks. Starts the commit stage
+ * after cleaning is complete.
+ */
+task startPipeline(dependsOn: ["clean", "uninstallDebug", "uninstallDebugAndroidTest"]) {
+    group "verification"
+    description "Starts the build pipeline"
+
+    afterEvaluate {
+        // Must do it this way because Gradle can't find `commitTests` otherwise
+        finalizedBy commitTests
+    }
+}
+
+/**
+ * Test ordering
+ */
+afterEvaluate {
+    // Some of these tasks are dynamically generated, so they aren't available until after the configuration phase
+    project.tasks.findByName('uiUnitTests').mustRunAfter 'testDebugUnitTest'
+    project.tasks.findByName('acceptanceTests').mustRunAfter 'commitTests'
+}
+
+/**
+ * This task is an aggregator. It combines the pure JVM unit test suite with the unit test
+ * portion of the UI test suite.
+ */
+task commitTests(dependsOn: ["jvmUnitTests", "uiUnitTests"]) {
     group "verification"
     description "Runs commit-stage tests"
 
-    // Next step in the pipeline
-    finalizedBy 'acceptanceTests'
+    doLast {
+        println ""
+        println "*************************\n" +
+                "* FINISHED COMMIT TESTS *\n" +
+                "*************************\n"
+    }
+
+    afterEvaluate {
+        // Must do it this way because Gradle can't find `acceptanceTests` otherwise
+        if (isInPipeline) {
+            finalizedBy acceptanceTests
+        }
+    }
 }
 
-task uiUnitTests(dependsOn: ["connectedDebugAndroidTest"]) {
+def getIsInPipeline() {
+    project.hasProperty('pipeline') ? pipeline.toBoolean() : true
+}
+
+/**
+ * Wrapper around the standard Android Gradle unit test task, because I wanted a more visible
+ * indicator they'd run.
+ */
+task jvmUnitTests(dependsOn: ["testDebugUnitTest"]) {
+    group "verification"
+    description "Runs JVM unit tests"
+
+    doLast {
+        println ""
+        println "***************************\n" +
+                "* FINISHED JVM UNIT TESTS *\n" +
+                "***************************\n"
+    }
+}
+
+/**
+ * This task runs the unit test portion of the UI test suite (all those tests annotated with {@code @CommitStage}.
+ */
+task uiUnitTests(dependsOn: ["installDebug", "installDebugAndroidTest"], type: Exec) {
     group "verification"
     description "Runs Espresso unit tests"
 
-    // TODO this gets evaluated and so set no matter what. I only want it set for this task. I may just have to use a normal bash script
-    // TODO maybe Exec tasks? Can an exec task execute a gradle command?
-    project.android.defaultConfig.testInstrumentationRunnerArguments(
-            annotation: "com.autonomousapps.reactivestopwatch.test.CommitStage"
-    )
+    commandLine "$adb shell am instrument -w -e annotation $commitStage $testPackage/$testRunner".split()
+
+    doLast {
+        println ""
+        println "**************************\n" +
+                "* FINISHED UI UNIT TESTS *\n" +
+                "**************************\n"
+    }
 }
 
-// TODO bad idea, has to start a new daemon
-task blah(type: Exec) {
-    commandLine "../gradlew uiUnitTests".split(' ')
-}
-
-
-// TODO remove
-afterEvaluate {
-    println "testInstrumentationRunnerArguments: " + project.android.defaultConfig.testInstrumentationRunnerArguments
-}
-
-afterEvaluate {
-    // These two tasks are dynamically generated, so they aren't available until after
-    // the configuration phase
-    project.tasks.findByName('connectedDebugAndroidTest').mustRunAfter 'testDebugUnitTest'
-}
-
-task acceptanceTests() {
+/**
+ * This task runs the acceptance test suite (all those tests annotated with {@code AcceptanceStage}.
+ */
+task acceptanceTests(dependsOn: ["installDebug", "installDebugAndroidTest"], type: Exec) {
     group "verification"
     description "Runs acceptance tests"
 
@@ -45,7 +103,40 @@ task acceptanceTests() {
         commitTests.state.failure == null
     }
 
+    commandLine "$adb shell am instrument -w -e annotation $acceptanceStage $testPackage/$testRunner".split()
+
     doLast {
-        println "acceptanceTests"
+        println ""
+        println "**********************************\n" +
+                "* FINISHED ACCEPTANCE UNIT TESTS *\n" +
+                "**********************************\n"
     }
+}
+
+def getAdb() {
+    project.android.adbExe
+}
+
+def getCommitStage() {
+    "${annotationPackage}.CommitStage"
+}
+
+def getAcceptanceStage() {
+    "${annotationPackage}.AcceptanceStage"
+}
+
+def getAnnotationPackage() {
+    "${baseApplicationPackage}.test.annotations"
+}
+
+def getBaseApplicationPackage() {
+    "com.autonomousapps.reactivestopwatch"
+}
+
+def getTestPackage() {
+    "${baseApplicationPackage}.test"
+}
+
+def getTestRunner() {
+    "android.support.test.runner.AndroidJUnitRunner"
 }

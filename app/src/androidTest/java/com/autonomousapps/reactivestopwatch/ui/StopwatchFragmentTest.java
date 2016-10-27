@@ -2,7 +2,7 @@ package com.autonomousapps.reactivestopwatch.ui;
 
 import com.autonomousapps.reactivestopwatch.R;
 import com.autonomousapps.reactivestopwatch.test.AbstractMockedDependenciesTest;
-import com.autonomousapps.reactivestopwatch.test.CommitStage;
+import com.autonomousapps.reactivestopwatch.test.annotations.CommitStage;
 import com.autonomousapps.reactivestopwatch.view.TimeTeller;
 
 import org.junit.Before;
