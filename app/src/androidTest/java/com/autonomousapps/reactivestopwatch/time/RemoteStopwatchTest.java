@@ -1,13 +1,10 @@
 package com.autonomousapps.reactivestopwatch.time;
 
-import com.autonomousapps.common.LogUtil;
+import com.autonomousapps.reactivestopwatch.service.SchedulerProvider;
 import com.autonomousapps.reactivestopwatch.test.AbstractMockedDependenciesTest;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -18,11 +15,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import rx.Observable;
-import rx.Scheduler;
 import rx.observers.TestSubscriber;
+import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
 
-import static com.autonomousapps.reactivestopwatch.di.RxModule.COMPUTATION_SCHEDULER;
 import static com.autonomousapps.reactivestopwatch.di.StopwatchModule.LOCAL_STOPWATCH;
 import static org.mockito.Mockito.when;
 
@@ -33,9 +29,8 @@ public class RemoteStopwatchTest extends AbstractMockedDependenciesTest {
     @Named(LOCAL_STOPWATCH)
     Stopwatch localStopwatch;
 
-    @Inject
-    @Named(COMPUTATION_SCHEDULER)
-    Scheduler computationScheduler;
+    //    @Inject @Named(COMPUTATION_SCHEDULER)
+    TestScheduler testScheduler = Schedulers.test();
 
     private Context context;
 
@@ -45,6 +40,7 @@ public class RemoteStopwatchTest extends AbstractMockedDependenciesTest {
     public void setup() throws Exception {
         super.setup();
         testComponent.inject(this);
+        SchedulerProvider.setComputationScheduler(testScheduler);
 
         context = InstrumentationRegistry.getTargetContext();
         remoteStopwatch = new RemoteStopwatch(context);
@@ -58,9 +54,8 @@ public class RemoteStopwatchTest extends AbstractMockedDependenciesTest {
 
         TestSubscriber<Long> testSubscriber = new TestSubscriber<>();
         remoteStopwatch.start().subscribe(testSubscriber);
-//        computationScheduler.triggerActions();
+        testScheduler.triggerActions();
 
         testSubscriber.assertReceivedOnNext(Arrays.asList(1L, 2L));
-
     }
 }

@@ -8,7 +8,9 @@ import com.autonomousapps.reactivestopwatch.time.Stopwatch;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -16,6 +18,7 @@ import javax.inject.Named;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
+import rx.schedulers.TestScheduler;
 import rx.subscriptions.CompositeSubscription;
 
 import static com.autonomousapps.reactivestopwatch.di.RxModule.COMPUTATION_SCHEDULER;
@@ -29,8 +32,8 @@ public class StopwatchService extends LifecycleLoggingService {
     @Named(LOCAL_STOPWATCH)
     Stopwatch stopwatch;
 
-    @Inject
-    @Named(COMPUTATION_SCHEDULER)
+//    @Inject
+//    @Named(COMPUTATION_SCHEDULER)
     Scheduler computationScheduler;
 
     private final CompositeSubscription subscriptions = new CompositeSubscription();
@@ -41,6 +44,7 @@ public class StopwatchService extends LifecycleLoggingService {
     public void onCreate() {
         super.onCreate();
         DaggerUtil.INSTANCE.getStopwatchComponent().inject(this);
+        computationScheduler = SchedulerProvider.getComputationScheduler();
     }
 
     @Override

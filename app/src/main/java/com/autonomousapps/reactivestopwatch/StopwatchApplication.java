@@ -18,7 +18,7 @@ public class StopwatchApplication extends LifecycleLoggingApplication {
     private void initDagger() {
         StopwatchComponent component = DaggerStopwatchComponent.builder()
                 .contextModule(new ContextModule(this))
-                .rxModule(new RxModule())
+//                .rxModule(new RxModule())
                 .build();
         DaggerUtil.INSTANCE.setComponent(component);
     }

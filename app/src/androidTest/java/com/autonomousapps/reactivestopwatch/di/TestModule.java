@@ -24,8 +24,8 @@ class TestModule {
     private final Stopwatch mockLocalStopwatch;
     private final Stopwatch mockRemoteStopwatch;
 
-    private final Scheduler testComputationScheduler = Schedulers.test();
-    private final Scheduler testMainThreadScheduler = Schedulers.test();
+//    private final Scheduler testComputationScheduler = Schedulers.test();
+//    private final Scheduler testMainThreadScheduler = Schedulers.test();
 
     TestModule() {
         mockStopwatchPresenter = mock(StopwatchMvp.Presenter.class);
@@ -50,15 +50,15 @@ class TestModule {
         return mockRemoteStopwatch;
     }
 
-    @Provides
-    @Named(COMPUTATION_SCHEDULER)
-    Scheduler providesComputationScheduler() {
-        return testComputationScheduler;
-    }
-
-    @Provides
-    @Named(MAIN_THREAD_SCHEDULER)
-    Scheduler providesMainThreadScheduler() {
-        return testMainThreadScheduler;
-    }
+//    @Provides
+//    @Named(COMPUTATION_SCHEDULER)
+//    Scheduler providesComputationScheduler() {
+//        return testComputationScheduler;
+//    }
+//
+//    @Provides
+//    @Named(MAIN_THREAD_SCHEDULER)
+//    Scheduler providesMainThreadScheduler() {
+//        return testMainThreadScheduler;
+//    }
 }
