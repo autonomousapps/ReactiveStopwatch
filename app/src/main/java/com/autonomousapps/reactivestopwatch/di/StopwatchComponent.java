@@ -9,7 +9,8 @@ import dagger.Component;
 
 @Singleton
 @Component(modules = {
-        PresenterModule.class
+        PresenterModule.class,
+        RxModule.class
 })
 public interface StopwatchComponent {
 

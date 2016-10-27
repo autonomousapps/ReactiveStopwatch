@@ -1,6 +1,7 @@
 package com.autonomousapps.reactivestopwatch.di;
 
 import com.autonomousapps.reactivestopwatch.service.StopwatchService;
+import com.autonomousapps.reactivestopwatch.time.RemoteStopwatchTest;
 import com.autonomousapps.reactivestopwatch.ui.StopwatchFragment;
 import com.autonomousapps.reactivestopwatch.ui.StopwatchFragmentTest;
 
@@ -13,6 +14,8 @@ import dagger.Component;
 public interface TestStopwatchComponent extends StopwatchComponent {
 
     void inject(StopwatchFragmentTest test);
+
+    void inject(RemoteStopwatchTest test);
 
     // TODO remove once bug is fixed
     void inject(StopwatchFragment fragment);

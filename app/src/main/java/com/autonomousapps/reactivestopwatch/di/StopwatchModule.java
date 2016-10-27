@@ -15,16 +15,19 @@ import dagger.Provides;
 @Module(includes = {
         ContextModule.class
 })
-abstract class StopwatchModule {
+public abstract class StopwatchModule {
+
+    public static final String LOCAL_STOPWATCH = "local";
+    public static final String REMOTE_STOPWATCH = "remote";
 
     @Binds
     public abstract TimeProvider bindsTimeProvider(SystemTimeProvider systemTimeProvider);
 
     @Binds
-    @Named("local")
+    @Named(LOCAL_STOPWATCH)
     public abstract Stopwatch bindsLocalStopwatch(StopwatchImpl stopwatch);
 
     @Binds
-    @Named("remote")
+    @Named(REMOTE_STOPWATCH)
     public abstract Stopwatch bindsRemoteStopwatch(RemoteStopwatch stopwatch);
 }

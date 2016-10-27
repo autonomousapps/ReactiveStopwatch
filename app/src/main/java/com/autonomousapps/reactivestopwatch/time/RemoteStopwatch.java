@@ -28,16 +28,14 @@ public class RemoteStopwatch implements Stopwatch {
     private static final String TAG = RemoteStopwatch.class.getSimpleName();
 
     private final Context context;
+    private final BehaviorSubject<IStopwatchService> serviceConnectionSubject = BehaviorSubject.create();
+    private final CompositeSubscription subscriptions = new CompositeSubscription();
 
     private IStopwatchService remoteService;
-    private BehaviorSubject<IStopwatchService> serviceConnectionSubject = BehaviorSubject.create();
-
-    private CompositeSubscription subscriptions;
 
     @Inject
     RemoteStopwatch(@NonNull Context context) {
         this.context = context;
-        subscriptions = new CompositeSubscription();
         startService();
     }
 

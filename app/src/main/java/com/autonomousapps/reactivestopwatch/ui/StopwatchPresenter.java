@@ -18,6 +18,8 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static com.autonomousapps.reactivestopwatch.di.StopwatchModule.REMOTE_STOPWATCH;
+
 @UiThread
 public class StopwatchPresenter implements StopwatchMvp.Presenter {
 
@@ -33,7 +35,7 @@ public class StopwatchPresenter implements StopwatchMvp.Presenter {
     private Scheduler observingScheduler = AndroidSchedulers.mainThread();
 
     @Inject
-    StopwatchPresenter(@NonNull @Named("remote") Stopwatch stopwatch) {
+    StopwatchPresenter(@NonNull @Named(REMOTE_STOPWATCH) Stopwatch stopwatch) {
         this.stopwatch = stopwatch;
     }
 

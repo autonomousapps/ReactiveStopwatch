@@ -13,16 +13,25 @@ import android.support.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import rx.Observable;
+import rx.Scheduler;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
+
+import static com.autonomousapps.reactivestopwatch.di.RxModule.COMPUTATION_SCHEDULER;
+import static com.autonomousapps.reactivestopwatch.di.StopwatchModule.LOCAL_STOPWATCH;
 
 public class StopwatchService extends LifecycleLoggingService {
 
     private static final String TAG = StopwatchService.class.getSimpleName();
 
     @Inject
-    @Named("local")
+    @Named(LOCAL_STOPWATCH)
     Stopwatch stopwatch;
+
+    @Inject
+    @Named(COMPUTATION_SCHEDULER)
+    Scheduler computationScheduler;
 
     private final CompositeSubscription subscriptions = new CompositeSubscription();
 
@@ -71,6 +80,9 @@ public class StopwatchService extends LifecycleLoggingService {
         this.isRunning = isRunning;
     }
 
+    private final Observable.Transformer<Long, Long> schedulingTransformer = observable ->
+            observable.observeOn(computationScheduler);
+
     private final IStopwatchService.Stub binder = new IStopwatchService.Stub() {
 
         private IStopwatchTickListener listener;
@@ -79,7 +91,9 @@ public class StopwatchService extends LifecycleLoggingService {
         public void start(IStopwatchTickListener listener) throws RemoteException {
             this.listener = listener;
 
-            Subscription subscription = stopwatch.start().subscribe(this::onTick);
+            Subscription subscription = stopwatch.start()
+                    .compose(schedulingTransformer)
+                    .subscribe(this::onTick);
             subscriptions.add(subscription);
 
             setIsRunning(true);
