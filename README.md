@@ -24,6 +24,9 @@ There's a principle in continuous deployment that anyone involved in a project o
 
 I could have achieved something like this by setting up Jenkins or another CI service, but I wanted something I could run easily on my machine, without external dependencies.
 
+## Android Nougat
+I wanted to experiment with Jack and Java 8 features (without Retrolambda), and so I set minSdk to 24 and ran with it. While working on this project, I have discovered a [number](https://code.google.com/p/android/issues/detail?id=225490) of [issues](https://code.google.com/p/android/issues/detail?id=224466) [relating](https://code.google.com/p/android/issues/detail?id=223549) to [Jack](https://github.com/google/dagger/issues/483). I have concluded that Jack is simply not production-ready at this time, but I did very much enjoy having easy access to Java 8 -- finally.
+
 # Libraries Used
 ## Production
  * [Dagger2](https://google.github.io/dagger/)
