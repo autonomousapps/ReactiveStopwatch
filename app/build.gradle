@@ -126,4 +126,4 @@ task sanityCheck {
     }
 }
 
-apply from: rootProject.file("gradle/tests.gradle")
+apply from: rootProject.file("gradle/pipeline.gradle")
