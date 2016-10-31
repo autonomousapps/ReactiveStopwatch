@@ -3,7 +3,7 @@
 /*
  * Main tasks available here:
  * (1) startPipeline   -- runs all tests, in order. Will not run ATs if commit tests fail.
- * (2) commitTests     -- runs jvm and ui unit tests. Will automatically run ATs if this suite fails, unless you use the
+ * (2) commitTests     -- runs jvm and ui unit tests. Will automatically run ATs if this suite succeeds, unless you use the
  *                        command-line argument -Ppipeline=false (`./gradlew commitTests -Ppipeline=false`)
  * (3) acceptanceTests -- runs acceptance tests.
  */
